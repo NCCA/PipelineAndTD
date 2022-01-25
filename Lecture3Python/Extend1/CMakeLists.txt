@@ -16,6 +16,11 @@ find_package (Python COMPONENTS Interpreter Development)
 
 
 add_executable(${TargetName})
+# on my mach need to add this not sure why as 
+# shouldn't be using the homebrew python just pyenv
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+   target_link_directories(${TargetName} PRIVATE /opt/homebrew/lib)
+endif()
 
 target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/extend.cpp)
 target_link_libraries(${TargetName} PRIVATE Python::Python)
