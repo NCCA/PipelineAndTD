@@ -13,15 +13,17 @@ options.add_options()
   ("h,height", "height of sim", cxxopts::value<int>()->default_value("400"))
   ("r,radius", "radius", cxxopts::value<float>()->default_value("3.5"))
   ("k,simcount", "iterations for k", cxxopts::value<int>()->default_value("40"))
+   ("s,seed", "seed", cxxopts::value<int>()->default_value("1234"))
    ;
   auto result = options.parse(argc, argv);
   auto width = result["width"].as<int>();
   auto height = result["height"].as<int>();
   auto r = result["radius"].as<float>();
   auto k = result["simcount"].as<int>();
+  auto seed = result["seed"].as<int>();
 
   auto begin = std::chrono::steady_clock::now();
-  auto scatter = PoissonDisk(width, height, r,k);
+  auto scatter = PoissonDisk(width, height, r,k,seed);
   auto end = std::chrono::steady_clock::now();
   std::cout << "Construction took " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]\n";
   begin = std::chrono::steady_clock::now();
