@@ -3,10 +3,19 @@
 
 #include <vector>
 #include <unordered_map>
+#include <utility>
 
 struct Point2
 {
   float x,y;
+};
+
+struct Index
+{
+    Index(int _x, int _y) : x{_x},y{_y}{}
+    Index operator+(const Index &_rhs)const ;
+    int x;
+    int y; 
 };
 
 class PoissonDisk
@@ -19,12 +28,12 @@ class PoissonDisk
     std::vector<Point2> sample();
 
   private :
-    Point2 getCellCoords(Point2 _xy);
-    std::vector<int> getNeighbours(Point2 _cords);
+    Index getCellCoords(Point2 _xy);
+    std::vector<int> getNeighbours(Index  _cords);
     bool pointValid(Point2 _pt);
     // return true if found and fill in o_found as the point
     bool getPoint(Point2 _pt, Point2 &o_found);
-    int getIndex(int _x, int _y);
+    int getIndex(Index _i);
 
     int m_width=50;
     int m_height=50;

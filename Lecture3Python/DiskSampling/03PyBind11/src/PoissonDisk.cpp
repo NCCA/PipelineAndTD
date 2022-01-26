@@ -5,12 +5,22 @@
 #include <array>
 #include <iostream>
 #include <algorithm>
-std::mt19937 g_generator;
+
+std::random_device g_rd;
+std::seed_seq g_seed{g_rd(), g_rd(), g_rd(), g_rd(), g_rd(), g_rd(), g_rd(), g_rd()};
+
+std::mt19937 g_generator(g_seed);
 
 
-int PoissonDisk::getIndex(int _x, int _y)
+
+Index Index::operator+(const Index &_rhs)const 
 {
-  return (m_nx*_y)+_x;
+  return Index(x+_rhs.x,y+_rhs.y);
+}
+
+int PoissonDisk::getIndex(Index _i)
+{
+  return (m_nx*_i.y)+_i.x;
 }
 
 
@@ -51,21 +61,21 @@ std::vector<Point2> PoissonDisk::sample()
 
   Point2 pt {wDist(g_generator),hDist(g_generator)};
   m_samples.push_back(pt);
-  //# Our first sample is indexed at 0 in the samples list...
+  // Our first sample is indexed at 0 in the samples list...
   auto cell=getCellCoords(pt);
-  m_cells[getIndex(cell.x,cell.y)] = 0;
-  //# and it is active, in the sense that we're going to look for more
-  //# points in its neighbourhood.
-  std::vector<size_t>active={0};
+  m_cells[getIndex(cell)] = 0;
+  // and it is active, in the sense that we're going to look for more
+  // points in its neighborhood.
+  std::vector<int>active={0};
   //# As long as there are points in the active list, keep looking for
   //# samples.
   while( !active.empty())
   {
-      //# choose a random "reference" point from the active list.
+      // choose a random "reference" point from the active list.
       auto choice=std::uniform_int_distribution<>(0,active.size()-1);
       size_t index=choice(g_generator);
-      auto idx = active[index];
-      auto refpt = m_samples[idx];
+      int idx = active[index];
+      Point2 refpt = m_samples[idx];
       //# Try to pick a new point relative to the reference point.
       Point2 pt;
       bool found = getPoint(refpt,pt);
@@ -76,11 +86,11 @@ std::vector<Point2> PoissonDisk::sample()
         auto nsamples =m_samples.size() - 1;
         active.push_back(nsamples);
         auto c=getCellCoords(pt);
-        m_cells[getIndex(c.x,c.y)] = nsamples;
+        m_cells[getIndex(c)] = nsamples;
       }
       else
       {
-        //   # remove it from the list of "active" points.
+        // remove it from the list of "active" points.
       active.erase(std::remove(active.begin(), active.end(), idx), active.end());
   
       }
@@ -88,25 +98,17 @@ std::vector<Point2> PoissonDisk::sample()
 
   return m_samples;
 }
-Point2 PoissonDisk::getCellCoords(Point2 _xy)
+
+Index PoissonDisk::getCellCoords(Point2 _xy)
 {
   // Get the coordinates of the cell that pt = (x,y) falls in.
-  Point2 p;
-  p.x=floor(_xy.x / m_a);
-  p.y=floor(_xy.y/m_a);
-//  ////std::cout<<p.x<<' '<<p.y<<'\n';
-  return p;
+  int x=floor(_xy.x/m_a);
+  int y=floor(_xy.y/m_a);
+  return Index(x,y);
 }
 
-std::vector<int> PoissonDisk::getNeighbours(Point2 _cords)
+std::vector<int> PoissonDisk::getNeighbours(Index _cords)
 {
-  struct Index
-  {
-    Index(int _x, int _y) : x{_x},y{_y}{}
-    
-    int x;
-    int y; 
-  };
   
 static  std::array<Index,21> dxdy = { Index(-1,-2),Index(0,-2),Index(1,-2),Index(-2,-1),
     Index(-1,-1),Index(0,-1),Index(1,-1),Index(2,-1),Index(-2,0),Index(-1,0),Index(1,0),Index(2,0),Index(-2,1),Index(-1,1),Index(0,1),Index(1,1),Index(2,1),Index(-1,2),Index(0,2),Index(1,2),Index(0,0)
@@ -114,21 +116,19 @@ static  std::array<Index,21> dxdy = { Index(-1,-2),Index(0,-2),Index(1,-2),Index
 std::vector<int> neighbours;
 for (auto i : dxdy)
 {
-  auto currentX = _cords.x + i.x;
-  auto currentY = _cords.y + i.y;
+  Index current=_cords+i;
+  //std::cout<<"dxdy "<<i.x<<' '<<i.y<<'\n';
 //  if not (0 <= neighbour_coords[0] < self.nx and
 //                    0 <= neighbour_coords[1] < self.ny)
-  //if (! (0 <= currentX < m_nx) && (0 <= currentY < m_ny))
-  if(  !(( currentX<=0 || currentX > m_nx) || (currentY<=0 || currentY <m_ny) ) )
+  if(  ( current.x<=0 && current.x >= m_nx) || (current.y<=0 && current.y >=m_ny)  )
   {
-    //std::cout<<"off grid "<<currentX<<' '<<currentY<<'\n';
-    ////std::cout<<"(*****************\n";
+    // off grid skip
     continue;
   }
-  int cell=m_cells[getIndex(currentX,currentY)];
+  int cell=m_cells[getIndex(current)];
   if( cell >=0)
   {
-   // std::cout<<getIndex(currentX,currentY)<<' '<<currentX<<' '<<currentY<<'\n';
+    //std::cout<<"Index values "<<getIndex(current)<<' '<<current.x<<' '<<current.x<<" nx ny "<<m_nx<<' '<<m_ny<<'\n';
     //std::cout<<"Cell value being added "<<cell<<'\n';
     neighbours.push_back(cell);
   }
@@ -151,7 +151,7 @@ bool PoissonDisk::pointValid(Point2 _pt)
   for(auto idx : neighbourhood)
   {
       auto nearby_pt = m_samples[idx];
-      // # Squared distance between candidate point, pt, and this nearby_pt.
+      //  Squared distance between candidate point, pt, and this nearby_pt.
       auto distance2 = ((nearby_pt.x-_pt.x)*(nearby_pt.x-_pt.x)) + ((nearby_pt.y-_pt.y)*(nearby_pt.y-_pt.y));
       if (distance2 < m_r*m_r)
       {
