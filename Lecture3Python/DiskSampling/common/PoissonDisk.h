@@ -2,8 +2,6 @@
 #define POSSIONDISK_H_
 
 #include <vector>
-#include <unordered_map>
-#include <utility>
 
 struct Point2
 {
