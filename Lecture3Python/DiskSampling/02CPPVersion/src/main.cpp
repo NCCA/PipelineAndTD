@@ -9,10 +9,10 @@ int main(int argc, char **argv)
 {
   cxxopts::Options options("Poisson", "simple PoissonDisk sample demo");
 options.add_options()
-  ("w,width", "width of sim", cxxopts::value<int>()->default_value("400"))
-  ("h,height", "height of sim", cxxopts::value<int>()->default_value("400"))
-  ("r,radius", "radius", cxxopts::value<float>()->default_value("3.5"))
-  ("k,simcount", "iterations for k", cxxopts::value<int>()->default_value("40"))
+  ("w,width", "width of sim", cxxopts::value<int>()->default_value("50"))
+  ("h,height", "height of sim", cxxopts::value<int>()->default_value("50"))
+  ("r,radius", "radius", cxxopts::value<float>()->default_value("1.0"))
+  ("k,simcount", "iterations for k", cxxopts::value<int>()->default_value("30"))
    ("s,seed", "seed", cxxopts::value<int>()->default_value("1234"))
    ;
   auto result = options.parse(argc, argv);
