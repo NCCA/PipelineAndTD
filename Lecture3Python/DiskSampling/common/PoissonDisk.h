@@ -7,7 +7,14 @@
 
 struct Point2
 {
-  float x,y;
+  union
+  {
+    struct {
+    float x,y;
+    };
+    float a[2];
+  };
+  float &operator[](const size_t & i){return a[i];}
 };
 
 struct Index

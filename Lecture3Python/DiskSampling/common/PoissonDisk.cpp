@@ -120,7 +120,7 @@ for (auto i : dxdy)
   //std::cout<<"dxdy "<<i.x<<' '<<i.y<<'\n';
 //  if not (0 <= neighbour_coords[0] < self.nx and
 //                    0 <= neighbour_coords[1] < self.ny)
-  if(  ( current.x<=0 && current.x >= m_nx) || (current.y<=0 && current.y >=m_ny)  )
+  if( !( ( current.x<=0 || current.x < m_nx) && (current.y<=0 || current.y <m_ny)))  
   {
     // off grid skip
     continue;
