@@ -16,12 +16,13 @@ option(ENABLE_FAST_MATH ON)
 find_package(pybind11 CONFIG REQUIRED)
 pybind11_add_module(${TargetName} NO_EXTRAS)
 
-target_include_directories(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/../common)
 target_sources(${TargetName} PRIVATE 
 
-${PROJECT_SOURCE_DIR}/src/PoissonDisk.cpp
 ${PROJECT_SOURCE_DIR}/src/PythonBindings.cpp
-${PROJECT_SOURCE_DIR}/include/PoissonDisk.h
+${PROJECT_SOURCE_DIR}/../common/PoissonDisk.cpp
+${PROJECT_SOURCE_DIR}/../common/PoissonDisk.h
+
 )
 
 target_link_libraries(${TargetName} PRIVATE   pybind11::module)

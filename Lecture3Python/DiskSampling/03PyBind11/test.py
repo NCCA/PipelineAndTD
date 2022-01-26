@@ -19,7 +19,7 @@ def plot(width = 400,height=400,r=3.5,k=20,seed=1234) :
     points=p.sample()
     end = datetime.now()
     delta = end-start
-    print('sample took {} ms size'.format(int(delta.total_seconds() * 1000),len(points)))
+    print('sample took {} ms size {}'.format(int(delta.total_seconds() * 1000),len(points)))
     plt.title("Poisson disk sampling")
     p2=[]
     for t in points :

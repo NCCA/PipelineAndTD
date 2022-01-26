@@ -16,9 +16,11 @@ option(ENABLE_FAST_MATH ON)
 
 add_executable(${TargetName})
 target_include_directories(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/../common)
+
 target_sources(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/src/main.cpp
-${PROJECT_SOURCE_DIR}/src/PoissonDisk.cpp
-${PROJECT_SOURCE_DIR}/include/PoissonDisk.h
+${PROJECT_SOURCE_DIR}/../common/PoissonDisk.cpp
+${PROJECT_SOURCE_DIR}/../common/PoissonDisk.h
 )
 
 

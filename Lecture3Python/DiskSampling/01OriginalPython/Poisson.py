@@ -75,10 +75,8 @@ class PoissonDisc():
 
     def _pointValid(self, pt):
         """Is pt a valid point to emit as a sample?
-        It must be no closer than r from any other point: check the cells in
-        its immediate neighbourhood.
+        It must be no closer than r from any other point: check the cells in its immediate neighbourhood.
         """
-
         cell_coords = self._getCellCoords(pt)
         for idx in self._getNeighbours(cell_coords):
             nearby_pt = self.samples[idx]
