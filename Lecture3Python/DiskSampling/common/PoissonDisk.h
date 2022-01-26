@@ -5,14 +5,9 @@
 
 struct Point2
 {
-  union
-  {
-    struct {
-    float x,y;
-    };
-    float a[2];
-  };
-  float &operator[](const size_t & i){return a[i];}
+  Point2(float _x, float _y) : x{_x},y{_y}{}
+  Point2()=default;
+  float x,y;
 };
 
 struct Index

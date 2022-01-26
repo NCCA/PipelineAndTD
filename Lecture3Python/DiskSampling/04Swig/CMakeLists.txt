@@ -16,10 +16,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 option(ENABLE_FAST_MATH ON)
 
-find_package (Python3 COMPONENTS  Development)
+#find_package (Python3 COMPONENTS  Development)
+find_package(pybind11 CONFIG REQUIRED)
 
 message("found python " ${Python_EXECUTABLE})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../common)
+
 
 set(CMAKE_SWIG_FLAGS "-builtin")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -31,5 +33,5 @@ swig_add_library(${TargetName}  TYPE MODULE LANGUAGE python SOURCES
 ${CMAKE_CURRENT_SOURCE_DIR}/src/PoissonDisk.i
 ${CMAKE_CURRENT_SOURCE_DIR}/../common/PoissonDisk.cpp
 )
-swig_link_libraries(${TargetName} Python3::Python )
+swig_link_libraries(${TargetName} pybind11::module )
 
