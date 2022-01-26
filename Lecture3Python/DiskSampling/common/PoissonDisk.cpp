@@ -18,6 +18,7 @@ Index Index::operator+(const Index &_rhs)const
   return Index(x+_rhs.x,y+_rhs.y);
 }
 
+
 int PoissonDisk::getIndex(Index _i)
 {
   return (m_nx*_i.y)+_i.x;

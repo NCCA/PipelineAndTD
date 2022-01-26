@@ -23,8 +23,6 @@ PYBIND11_MODULE(PoissonDisk,m)
                           std::to_string(p.y)+"]";})
           .def_readwrite("x", &Point2::x)
           .def_readwrite("y", &Point2::y)
-          .def("__getitem__",py::overload_cast<const size_t &>( &Point2::operator[]))
-
       ;
   py::class_<PoissonDisk>(m, "PoissonDisk")
       .def(py::init<int, int, float , int , int >(),
