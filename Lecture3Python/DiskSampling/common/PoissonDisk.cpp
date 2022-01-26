@@ -117,11 +117,7 @@ std::vector<int> neighbours;
 for (auto i : dxdy)
 {
   Index current=_cords+i;
-  //std::cout<<"dxdy "<<i.x<<' '<<i.y<<'\n';
-//  if not (0 <= neighbour_coords[0] < self.nx and
-//                    0 <= neighbour_coords[1] < self.ny)
   if( !((current.x >= 0) && (current.x < m_nx) && (current.y >= 0) && (current.y < m_ny)))
-  //if( !( ( current.x<=0 || current.x < m_nx) && (current.y<=0 || current.y <m_ny)))  
   {
     // off grid skip
     continue;
@@ -129,24 +125,19 @@ for (auto i : dxdy)
   int cell=m_cells[getIndex(current)];
   if( cell >=0)
   {
-    //std::cout<<"Index values "<<getIndex(current)<<' '<<current.x<<' '<<current.x<<" nx ny "<<m_nx<<' '<<m_ny<<'\n';
-    //std::cout<<"Cell value being added "<<cell<<'\n';
     neighbours.push_back(cell);
   }
 }
-//std::cout<<"found ne "<<neighbours.size()<<'\n';
 return neighbours;
 
 }
 
 bool PoissonDisk::pointValid(Point2 _pt)
 {
-/*
- """Is pt a valid point to emit as a sample?
-        It must be no closer than r from any other point: check the cells in
-        its immediate neighbourhood.
-        """
-*/
+
+//  Is pt a valid point to emit as a sample?
+// It must be no closer than r from any other point: check the cells in its immediate neighbourhood.
+
   auto cell_coords = getCellCoords(_pt);
   auto neighbourhood=getNeighbours(cell_coords);
   for(auto idx : neighbourhood)
@@ -156,7 +147,7 @@ bool PoissonDisk::pointValid(Point2 _pt)
       auto distance2 = ((nearby_pt.x-_pt.x)*(nearby_pt.x-_pt.x)) + ((nearby_pt.y-_pt.y)*(nearby_pt.y-_pt.y));
       if (distance2 < m_r*m_r)
       {
-      //  # The points are too close, so pt is not a candidate.
+      // The points are too close, so pt is not a candidate.
         return false;
       }
   }
@@ -164,13 +155,13 @@ bool PoissonDisk::pointValid(Point2 _pt)
 }
 bool PoissonDisk::getPoint(Point2 _pt, Point2 &o_found)
 {
- /*   """Try to find a candidate point near refpt to emit in the sample.
-        We draw up to k points from the annulus of inner radius r, outer radius
-        2r around the reference point, refpt. If none of them are suitable
-        (because they're too close to existing points in the sample), return
-        False. Otherwise, return the pt.
-        """
-*/
+
+// Try to find a candidate point near refpt to emit in the sample.
+// We draw up to k points from the annulus of inner radius r, outer radius
+// 2r around the reference point, refpt. If none of them are suitable
+// (because they're too close to existing points in the sample), return
+// False. Otherwise, return the pt.
+
   int i = 0;
   auto rhoDist=std::uniform_real_distribution<float>(m_r,2.0f*m_r);
   auto thetaDist=std::uniform_real_distribution<float>(0.0f,2.0f*M_PI);

@@ -18,7 +18,6 @@ pybind11_add_module(${TargetName} NO_EXTRAS)
 
 target_include_directories(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/../common)
 target_sources(${TargetName} PRIVATE 
-
 ${PROJECT_SOURCE_DIR}/src/PythonBindings.cpp
 ${PROJECT_SOURCE_DIR}/../common/PoissonDisk.cpp
 ${PROJECT_SOURCE_DIR}/../common/PoissonDisk.h
