@@ -47,7 +47,13 @@ void PoissonDisk::reset(bool _reseed)
   for(auto &c : m_cells)
     c=-1; 
 }
-std::vector<Point2> PoissonDisk::sample()
+
+
+ #ifdef PYBIND11
+  py::list PoissonDisk::sample()
+#else
+  std::vector<Point2> PoissonDisk::sample()
+#endif 
 {
   // """Poisson disc random sampling in 2D.
   // Draw random samples on the domain width x height such that no two
@@ -96,8 +102,12 @@ std::vector<Point2> PoissonDisk::sample()
   
       }
   }
-
+ #ifdef PYBIND11
+  py::list list=py::cast(m_samples);
+  return list;
+ #else 
   return m_samples;
+ #endif
 }
 
 Index PoissonDisk::getCellCoords(Point2 _xy)

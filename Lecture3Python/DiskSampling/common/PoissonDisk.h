@@ -1,6 +1,10 @@
 #ifndef POSSIONDISK_H_
 #define POSSIONDISK_H_
 
+#ifdef PYBIND11
+  #include <pybind11/stl.h>
+  namespace py = pybind11;
+#endif
 #include <vector>
 
 struct Point2
@@ -23,8 +27,11 @@ class PoissonDisk
   public :
     PoissonDisk(int _width=50, int _height=50, float _r=1.0, int _k=30, int _seed=1234);
     void reset(bool _reseed=true);
-    std::vector<Point2> sample();
-
+    #ifdef PYBIND11
+      py::list sample();
+    #else
+      std::vector<Point2> sample();
+    #endif 
   private :
     Index getCellCoords(Point2 _xy);
     std::vector<int> getNeighbours(Index  _cords);
