@@ -35,11 +35,12 @@ std::ofstream fileOut;
 fileOut.open("scatter.py");
 fileOut<<"#!/usr/bin/env python\n";
 fileOut<<"import matplotlib.pyplot as plt\n";
-fileOut<<"points=[]\n";
+fileOut<<"points=[\n";
 for(auto p : points)
 {
-  fileOut<<"points.append(("<<p.x<<','<<p.y<<"))\n";
+  fileOut<<"("<<p.x<<','<<p.y<<"),\n";
 }
+fileOut<<"]\n";
 fileOut<<"plt.title(\"Poisson disk sampling\")\n";
 fileOut<<"plt.scatter(*zip(*points),s="<<r<<") \n";
 fileOut<<"plt.show() \n";

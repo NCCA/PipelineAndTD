@@ -13,7 +13,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 option(ENABLE_FAST_MATH ON)
 
-
 add_executable(${TargetName})
 target_include_directories(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(${TargetName} PRIVATE ${PROJECT_SOURCE_DIR}/../common)
