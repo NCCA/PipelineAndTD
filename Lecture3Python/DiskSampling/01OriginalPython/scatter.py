@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import argparse
 
-def plot(width = 400,height =400,r=3.5,k=20) :
+def plot(width = 400,height =400,r=3.5,k=20,seed=1234) :
     start = datetime.now()
-    scatter = ps.PoissonDisc(width, height, r,k)
+    scatter = ps.PoissonDisc(width, height, r,k,seed)
     end = datetime.now()
     delta = end-start
 
@@ -39,7 +39,10 @@ if __name__ == '__main__' :
     parser.add_argument('--simcount', '-k' ,nargs='?', 
 											const=40, default=40,type=int,
 											help='sim steps')
+    parser.add_argument('--seed', '-s' ,nargs='?', 
+											const=1234, default=1234,type=int,
+											help='random seed')
     args = parser.parse_args()
 
 
-    plot(args.width,args.height,args.radius,args.simcount)
+    plot(args.width,args.height,args.radius,args.simcount,args.seed)

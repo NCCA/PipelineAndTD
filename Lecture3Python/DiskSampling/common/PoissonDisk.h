@@ -22,8 +22,6 @@ class PoissonDisk
 {
   public :
     PoissonDisk(int _width=50, int _height=50, float _r=1.0, int _k=30, int _seed=1234);
-
-    //Point2 & operator[](size_t i);
     void reset(bool _reseed=true);
     std::vector<Point2> sample();
 
@@ -34,15 +32,13 @@ class PoissonDisk
     // return true if found and fill in o_found as the point
     bool getPoint(Point2 _pt, Point2 &o_found);
     int getIndex(Index _i);
-
     int m_width=50;
     int m_height=50;
     float m_r=1.0f;
     int m_k=30;
     float m_a=0.0f;
     std::vector<Point2> m_samples;    
-    // cell index values, set to max size_t for none
-    // hash function in cpp file for long index.
+    // cell index values, set to -1 for None
     std::vector<int> m_cells;
     // Number of cells in the x- and y-directions of the grid
     int m_nx;
