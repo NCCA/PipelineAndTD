@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 option(ENABLE_FAST_MATH ON)
-
+add_definitions(-DPYBIND11)
 find_package(pybind11 CONFIG REQUIRED)
 pybind11_add_module(${TargetName} NO_EXTRAS)
 
