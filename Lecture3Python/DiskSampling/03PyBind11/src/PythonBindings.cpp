@@ -8,6 +8,7 @@
 #include <pybind11/complex.h>
 
 namespace py = pybind11;
+using namespace pybind11::literals; // (for _a arguments)
 
 PYBIND11_MAKE_OPAQUE(std::vector<Point2>);
 
@@ -34,13 +35,12 @@ PYBIND11_MODULE(PoissonDisk,m)
       ;
   py::class_<PoissonDisk>(m, "PoissonDisk")
       .def(py::init<int, int, float , int , int >(),
-      py::arg("_width") = 50,
-      py::arg("_height") = 50,
-      py::arg("_r") = 1.0f,
-      py::arg("_k") = 30,
-      py::arg("_seed") = 1234,
+      "_width"_a=50,"_height"_a = 50,"_r"_a = 1.0f,
+      "_k"_a = 30,"_seed"_a = 1234,
       "Constructor for PoissonDisk class passing in the Width, Height \nof the sample area, radius of the disk, number of attempts to find a sample and seed"
       )
+
+      // note we can also use   py::arg("_width") = 50 instead of "_width"_a=50
 
       .def("reset",&PoissonDisk::reset,"Reset the simulation with a new seed")
       .def("sample",&PoissonDisk::sample,"calculate samples and return a list")
