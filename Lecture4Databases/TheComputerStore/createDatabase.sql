@@ -1,5 +1,4 @@
 
-# add tables
 CREATE TABLE Manufacturers (
                             Code INTEGER PRIMARY KEY NOT NULL,
                             Name TEXT NOT NULL
@@ -9,7 +8,6 @@ CREATE TABLE Products ( Code INTEGER PRIMARY KEY NOT NULL,
                         Price REAL NOT NULL ,         
                         Manufacturer INTEGER NOT NULL                
                         );
-# add data 
 INSERT INTO Manufacturers(Code,Name) VALUES(1,'Sony');
 INSERT INTO Manufacturers(Code,Name) VALUES(2,'Creative Labs');
 INSERT INTO Manufacturers(Code,Name) VALUES(3,'Hewlett-Packard');
