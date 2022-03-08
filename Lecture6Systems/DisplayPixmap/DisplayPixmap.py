@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 try:  # support either PyQt5 or 6
     from PyQt5.QtCore import *
-    from PyQt5.QtGui import QMainWindow
-    from PyQt5.QtWidgets import QApplication
+    from PyQt5.QtWidgets import QApplication,QMainWindow,QLabel
+    from PyQt5.QtGui import QImage,QPixmap
 
     PyQtVersion = 5
 except ImportError:
@@ -10,7 +10,6 @@ except ImportError:
     from PyQt6.QtCore import Qt, QTimer
     from PyQt6.QtGui import QImage, QPixmap
     from PyQt6.QtWidgets import QApplication, QLabel, QMainWindow
-
     PyQtVersion = 6
 
 import argparse
@@ -71,7 +70,6 @@ class MainWindow(QMainWindow):
             QImage.Format.Format_RGBA8888
             if PyQtVersion == 6
             else QImage.Format_RGBA8888,
-            None,
         )
 
         self.pixmap = QPixmap.fromImage(img)
