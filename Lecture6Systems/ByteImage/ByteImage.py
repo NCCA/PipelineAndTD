@@ -48,16 +48,12 @@ class ByteImage:
 
     def random_pixels(self, alpha: int = 255):
         """fill buffer with random rgb values alpha to 255"""
-        for y in range(0, self.height):
-            for x in range(0, self.width):
-                self.set_pixel(
-                    x,
-                    y,
-                    random.randint(0, 255),
-                    random.randint(0, 255),
-                    random.randint(0, 255),
-                    alpha,
-                )
+        ri = random.randint
+        for i, _ in enumerate(self.pixels):
+            if (i + 1) % 4 == 0:
+                self.pixels[i] = alpha
+            else:
+                self.pixels[i] = ri(0, 255)
 
     def checker(
         self, r1: int, g1: int, b1: int, r2: int, g2: int, b2: int, check_size=10
