@@ -13,4 +13,4 @@ except OSError as oe:
 
 with open(FIFO, "w") as fifo:
     for i in range(0, 100):
-        fifo.write(f"{i}")
+        fifo.write(f"{i}\n")

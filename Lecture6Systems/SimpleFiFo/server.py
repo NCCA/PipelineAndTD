@@ -9,8 +9,14 @@ from functools import partial
 FIFO = "mypipe"
 
 
-def main() :
-    server_active=True
+def sig_handler(signum, frame):
+    if signum in [signal.SIGHUP, signal.SIGINT]:
+        print("stopping server and removing fifo")
+        os.remove(FIFO)
+        sys.exit(os.EX_OK)
+
+
+def main():
 
     try:
         os.mkfifo(FIFO)
@@ -19,26 +25,22 @@ def main() :
             raise
     print(f"use ctrl + c to stop {os.getpid()}")
 
-    def sig_handler(signum,frame) :
-        nonlocal server_active
-        if signum in [signal.SIGHUP,signal.SIGINT] :
-            print(f"stopping server and removing fifo{server_active}")
-            server_active=False
-
     signal.signal(signal.SIGHUP, sig_handler)
     signal.signal(signal.SIGINT, sig_handler)
-    while server_active :
+    while True:
+        print("start while")
         with open(FIFO) as fifo:
-            while True and server_active:
+            print("Open")
+            while True:
+                print("reading")
                 data = fifo.read()
+                print(f"read {len(data)} {type(data)}")
                 if len(data) == 0:
+                    print("break")
                     break
-                print(f"{data}")
-    os.remove(FIFO)
+                print(f"out")
 
 
+if __name__ == "__main__":
 
-
-if __name__ == "__main__" :
- 
     main()
