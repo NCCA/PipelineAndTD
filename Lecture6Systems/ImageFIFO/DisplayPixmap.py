@@ -60,7 +60,15 @@ class MainWindow(QMainWindow):
         os.remove(FIFO)
 
     def update_image(self, data):
-        print("update")
+        try:
+            if "resize" in data.decode("utf-8"):
+                format = data.decode("utf-8").split(" ")
+                self.width = int(format[1])
+                self.height = int(format[2])
+                self.resize(self.width, self.height)
+        except:
+            pass
+
         img = QImage(
             data,
             self.width,
@@ -102,19 +110,19 @@ if __name__ == "__main__":
         "--width",
         "-w",
         nargs="?",
-        const=800,
-        default=800,
+        const=400,
+        default=400,
         type=int,
-        help="width of image default 800",
+        help="width of image default 400",
     )
     parser.add_argument(
         "--height",
         "-ht",
         nargs="?",
-        const=800,
-        default=800,
+        const=400,
+        default=400,
         type=int,
-        help="height of image default 800",
+        help="height of image default 400",
     )
 
     args = parser.parse_args()

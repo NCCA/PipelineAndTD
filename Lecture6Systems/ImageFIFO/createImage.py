@@ -8,7 +8,7 @@ import ByteImage
 
 if __name__ == "__main__":
     rx = random.randint
-    img = ByteImage.ByteImage(800, 800, 255, 0, 0, 255)
+    img = ByteImage.ByteImage(400, 400, 255, 0, 0, 255)
 
     for i in range(0, 200):
         img.clear(255, 255, 255)
