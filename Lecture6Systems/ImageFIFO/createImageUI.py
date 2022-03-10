@@ -2,8 +2,8 @@
 try:  # support either PyQt5 or 6
     from PyQt5 import uic
     from PyQt5.QtCore import *
-    from PyQt5.QtGui import QMainWindow, QSurfaceFormat
-    from PyQt5.QtWidgets import QApplication
+    from PyQt5.QtGui import  QSurfaceFormat
+    from PyQt5.QtWidgets import QApplication,QMainWindow
 
     PyQtVersion = 5
 except ImportError:
