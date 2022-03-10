@@ -2,8 +2,8 @@
 try:  # support either PyQt5 or 6
     from PyQt5 import uic
     from PyQt5.QtCore import *
-    from PyQt5.QtGui import  QSurfaceFormat
-    from PyQt5.QtWidgets import QApplication,QMainWindow
+    from PyQt5.QtGui import QSurfaceFormat
+    from PyQt5.QtWidgets import QApplication, QMainWindow
 
     PyQtVersion = 5
 except ImportError:
@@ -68,7 +68,7 @@ class MainWindow(QMainWindow):
             self.width.value(), self.height.value(), 255, 255, 255, 255
         )
         img.checker(
-            rx(0, 255), rx(0, 255), rx(0, 255), rx(0, 255), rx(0, 255), rx(0, 255)
+            rx(0, 255), rx(0, 255), rx(0, 255), 255, 255, 255, check_size=rx(5, 50)
         )
         with open(self.fifo_name.text(), "wb") as fifo:
             fifo.write(img.pixels)

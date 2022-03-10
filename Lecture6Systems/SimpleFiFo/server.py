@@ -4,7 +4,6 @@ import errno
 import os
 import signal
 import sys
-from functools import partial
 
 FIFO = "mypipe"
 
