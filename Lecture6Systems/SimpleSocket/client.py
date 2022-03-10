@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import argparse
 import socket
 
 
@@ -20,4 +21,27 @@ def main(host, port):
 if __name__ == "__main__":
     HOST = "127.0.0.1"  # The server's hostname or IP address
     PORT = 65432  # The port used by the server
-    main(HOST, PORT)
+
+    parser = argparse.ArgumentParser(description="Echo client")
+
+    parser.add_argument(
+        "--host",
+        "-hs",
+        nargs="?",
+        const="127.0.0.1",
+        default="127.0.0.1",
+        type=str,
+        help="hostname",
+    )
+    parser.add_argument(
+        "--port",
+        "-p",
+        nargs="?",
+        const=65432,
+        default=65432,
+        type=int,
+        help="server port (non-privileged ports are > 1023)",
+    )
+
+    args = parser.parse_args()
+    main(args.host, args.port)
