@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 try:  # support either PyQt5 or 6
-    from PyQt5.QtCore import Qt, QTimer, pyqtSignal
+    from PyQt5.QtCore import Qt, QTimer, pyqtSignal,QObject,QThread
     from PyQt5.QtGui import QImage, QPixmap
     from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow
 
@@ -63,6 +63,7 @@ class MainWindow(QMainWindow):
         try:
             if "resize" in data.decode("utf-8"):
                 format = data.decode("utf-8").split(" ")
+                print(format)
                 self.width = int(format[1])
                 self.height = int(format[2])
                 self.resize(self.width, self.height)
