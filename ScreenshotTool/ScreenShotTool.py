@@ -18,7 +18,7 @@ class ScreenShotsDialog(QtWidgets.QDialog):
             super().__init__(parent)
         # python 2
         else:
-            super(ScreenShotsDialog, self).__init__(self)
+            super(ScreenShotsDialog, self).__init__(parent)
         self.setWindowTitle("Screen shot Tool")
 
         self.resize(190, 148)
