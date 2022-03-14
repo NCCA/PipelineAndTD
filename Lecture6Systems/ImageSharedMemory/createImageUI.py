@@ -36,7 +36,8 @@ class MainWindow(QMainWindow):
         self.height = 400
         self.img = ByteImage.ByteImage(self.width, self.height, 255, 255, 255, 255)
 
-    def __del__(self):
+    def closeEvent(self, event):
+        self.timer.stop()
         self.shm.close()
 
     def toggle_sim(self):
@@ -48,6 +49,7 @@ class MainWindow(QMainWindow):
             self.start_sim.setText("Stop")
 
     def update_memory(self):
+        # should be a better way of doing this
         for i in range(0, len(self.img.pixels)):
             self.shm.buf[i] = self.img.pixels[i]
 
