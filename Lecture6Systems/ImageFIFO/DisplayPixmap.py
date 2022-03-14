@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 try:  # support either PyQt5 or 6
-    from PyQt5.QtCore import Qt, QTimer, pyqtSignal,QObject,QThread
+    from PyQt5.QtCore import QObject, Qt, QThread, QTimer, pyqtSignal
     from PyQt5.QtGui import QImage, QPixmap
     from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow
 
@@ -56,7 +56,7 @@ class MainWindow(QMainWindow):
         self.thread.start()
         # self.update_image()
 
-    def __del__(self):
+    def closeEvent(self, event):
         os.remove(FIFO)
 
     def update_image(self, data):

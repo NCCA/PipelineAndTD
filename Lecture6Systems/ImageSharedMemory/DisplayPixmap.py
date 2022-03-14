@@ -17,6 +17,7 @@ import errno
 import os
 import random
 import sys
+import time
 from multiprocessing import shared_memory
 
 
@@ -37,7 +38,7 @@ class MainWindow(QMainWindow):
         self.timer.timeout.connect(self.update_image)
         self.timer.start(1)
 
-    def __del__(self):
+    def closeEvent(self, event):
         self.shm.close()
         self.shm.unlink()
 
