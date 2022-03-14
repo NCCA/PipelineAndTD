@@ -1,4 +1,4 @@
- CREATE TABLE `Scores` (
+CREATE TABLE `Scores` (
   `highScore` INT NULL DEFAULT 0,
   `FirstName` VARCHAR(45) NOT NULL,
   `LastName` VARCHAR(45) NOT NULL,
