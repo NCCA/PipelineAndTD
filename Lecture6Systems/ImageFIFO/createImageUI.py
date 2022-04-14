@@ -29,7 +29,7 @@ class MainWindow(QMainWindow):
         uic.loadUi("form.ui", self)  # Load the .ui file
         self.width.valueChanged.connect(self.transmit_size)
         self.height.valueChanged.connect(self.transmit_size)
-        self.start_sim.pressed.connect(self.toggle_sim)
+        self.start_sim.clicked.connect(self.toggle_sim)
         self.timer = QTimer()
         self.timer.timeout.connect(self.transmit_data)
 

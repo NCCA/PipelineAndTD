@@ -28,7 +28,7 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(QMainWindow, self).__init__(parent)
         uic.loadUi("form.ui", self)  # Load the .ui file
-        self.start_sim.pressed.connect(self.toggle_sim)
+        self.start_sim.clicked.connect(self.toggle_sim)
         self.timer = QTimer()
         self.timer.timeout.connect(self.transmit_data)
         self.shm = shared_memory.SharedMemory(name="imageMap")
