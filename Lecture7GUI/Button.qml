@@ -1,6 +1,9 @@
-import QtQuick 
-import QtQuick.Controls 
-import QtQuick.Layouts
+import QtQuick 2.12
+import QtQuick.Window 2.12
+import QtQuick.Controls 2.0
+import QtQuick.Layouts 1.3
+import QtQuick.Dialogs 1.2
+
 Window {
     visible: true
     width: 800
@@ -65,18 +68,7 @@ Window {
             Layout.column: 1
             text : qsTr("This is a Dialog Button Box")
         }
-        DialogButtonBox{
-            Layout.row : 2
-            Layout.column: 2
-            standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
-
-        }
-
-        RoundButton{
-            Layout.row : 3
-            Layout.column: 0
-            text : qsTr("Round Button")
-        }
+        
         ToolButton{
             Layout.row : 3
             Layout.column: 1
