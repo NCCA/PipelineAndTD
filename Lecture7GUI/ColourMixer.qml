@@ -1,9 +1,9 @@
-import QtQuick
-import QtQuick.Window
-import QtQuick.Layouts
-import QtQuick.Controls
-import QtQuick.Dialogs
-import Qt.labs.platform
+import QtQuick 2.12
+import QtQuick.Window 2.12
+import QtQuick.Controls 2.0
+import QtQuick.Layouts 1.3
+import QtQuick.Dialogs 1.2
+
 
 Window {
     width: 400
