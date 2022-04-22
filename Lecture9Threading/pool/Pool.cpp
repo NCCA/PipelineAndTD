@@ -22,7 +22,7 @@ struct Pool
     std::unique_lock<std::mutex> lock(mutex);
     while(things.empty())
     {
-        Logger::critical("Waiting Lock");
+        Logger::debug("Waiting Lock");
         cv.wait(lock);
     }
     auto r=std::move(things.back()); // I know it's an int
@@ -37,6 +37,8 @@ struct Pool
     lock.unlock();
     Logger::error("calling Notify");
     cv.notify_one();
+    //cv.notify_all();
+    
   }
   std::vector<int> things;
   std::mutex mutex;
@@ -49,23 +51,27 @@ int main()
   std::uniform_int_distribution<int> sleep_for(500,1550);
 
   Pool pool(4);
-	auto nThreads = std::thread::hardware_concurrency();
+  auto nThreads = std::thread::hardware_concurrency();
   Logger::info(fmt::format("Have {} threads",nThreads));
 	std::vector<std::thread> workers(nThreads);
+  int readableID=0;
   for(auto &t : workers)
   {
+
     t=std::thread([&](){
+      thread_local int localID=readableID;
       while(true)  
       {
         // grab thing from pool
         auto thing=pool.getThing();
-        Logger::warning(fmt::format("Thread {} has thing {}",std::this_thread::get_id(),thing));
+        Logger::warning(fmt::format("Thread {} has thing {}",localID,thing));
         // simulate work
         std::this_thread::sleep_for(std::chrono::milliseconds(sleep_for(rng)));
         // return when done
         pool.returnThing(thing);
       }
     });
+    ++readableID;
   }
   for(auto &t : workers)
     t.join();
