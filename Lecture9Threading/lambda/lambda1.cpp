@@ -9,4 +9,5 @@ int main()
   Logger::warning(fmt::format("Parent id {}", std::this_thread::get_id()));
   std::thread t1([]()
                  { Logger::info(fmt::format("In thread {}", std::this_thread::get_id())); });
+  t1.join();
 }
