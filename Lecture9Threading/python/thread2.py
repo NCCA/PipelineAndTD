@@ -18,6 +18,6 @@ if __name__ == "__main__":
     thread = threading.Thread(target=thread_function, args=(1,), daemon=True)
     logging.info("Main starting thread")
     thread.start()
-    #thread.join()
+    # thread.join()
     logging.info("Main waiting for finish")
     logging.info("Main finished")
