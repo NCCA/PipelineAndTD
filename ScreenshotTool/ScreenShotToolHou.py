@@ -7,6 +7,14 @@ from PySide2 import QtCore, QtWidgets
 class ScreenShotsDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
+        # Move to Build mode
+        self.desktops_dict = dict((d.name(), d) for d in hou.ui.desktops())
+        self.desktops_dict["Build"].setAsCurrent()
+        self.scene_view=hou.ui.paneTabOfType(hou.paneTabType.SceneViewer)
+        self.viewport = self.scene_view.curViewport()
+        fbs = self.scene_view.flipbookSettings().stash()
+        # we can only scale to this resolution so save for max width / height
+        resolution=fbs.resolution()
         # Set the GUI components and layout
         self.setWindowTitle("Screenshot Tool")
         self.resize(200, 180)
@@ -49,7 +57,6 @@ class ScreenShotsDialog(QtWidgets.QDialog):
         self.uv.setChecked(True)
         self.gbGridLayout.addWidget(self.uv, 3, 1, 1, 1)
 
-
         # Add to main dialog
         self.gridLayout.addWidget(self.groupBox, 1, 0, 1, 2)
 
@@ -66,7 +73,7 @@ class ScreenShotsDialog(QtWidgets.QDialog):
 
         self.width = QtWidgets.QSpinBox(self)
         self.width.setMinimum(64)
-        self.width.setMaximum(1024)
+        self.width.setMaximum(resolution[0])
         self.width.setProperty("value", 128)
         self.gridLayout.addWidget(self.width, 4, 0, 1, 1)
 
@@ -75,7 +82,7 @@ class ScreenShotsDialog(QtWidgets.QDialog):
 
         self.height = QtWidgets.QSpinBox(self)
         self.height.setMinimum(64)
-        self.height.setMaximum(1024)
+        self.height.setMaximum(resolution[1])
         self.height.setSingleStep(0)
         self.height.setProperty("value", 128)
         self.gridLayout.addWidget(self.height, 4, 1, 1, 1)
@@ -100,6 +107,25 @@ class ScreenShotsDialog(QtWidgets.QDialog):
         directory=hou.ui.selectFile(None,"Choose destination folder",False,hou.fileType.Directory,"","",False,False,hou.fileChooserMode.Write)
         if directory == "" :
             return
+        
+    
+        directory=directory.partition("/")
+        print(directory)
+        # we have $HOME so extract the full $HOME path and use it
+        if directory[0]=="$HOME" :
+                prefix=str(hou.getenv("HOME"))
+        elif directory[0] == "$HIP" :
+        #we have $HIP so extract the full $HIP path
+                prefix=str(hou.getenv("HIP"))
+        # we have a $JOB so extract the full $JOB path
+        elif directory[0] == "$JOB" :
+                prefix=str(hou.getenv("JOB"))
+        # nothing so just blank the string
+        else :
+                prefix=str("")
+        #now construct our new file name from the elements we've found
+        directory=f"{prefix}/{directory[2]}" 
+        print(directory)
         # We evaluate these commands to set the view
         # for the screen shot
         # This is used to see if the view should be exported
@@ -126,25 +152,27 @@ class ScreenShotsDialog(QtWidgets.QDialog):
         name = ["Persp", "Top", "Left", "Front","Back","Right","Bottom","UV"]
 
 
-        # Move to Build mode
-        desktops_dict = dict((d.name(), d) for d in hou.ui.desktops())
-        desktops_dict["Build"].setAsCurrent()
-        scene_view=hou.ui.paneTabOfType(hou.paneTabType.SceneViewer)
-        viewport = scene_view.curViewport()
         frame=hou.frame()
-
         for i in range(0,len(name)) :
             if eval(isActive[i]) :
-                filename=f"{directory}/{self.base_name.text()}{name[i]}.png" 
-                viewport.changeType(views[i])
+                filename=f"{directory}{self.base_name.text()}{name[i]}.png" 
+                self.viewport.changeType(views[i])
                 if self.frame_all.isChecked():
-                    viewport.frameAll()
-                fbs = scene_view.flipbookSettings().stash()
+                    self.viewport.frameAll()
+
+                fbs = self.scene_view.flipbookSettings().stash()
+                print(fbs.resolution())
+
+                fbs.useResolution(True)
                 fbs.resolution((self.width.value(),self.height.value()))
+                print(fbs.resolution())
                 fbs.frameRange( (frame, frame) )
-                fbs.output(filename)
                 fbs.outputToMPlay(False)
-                scene_view.flipbook(viewport, fbs)
+
+
+                fbs.output(filename)
+                print(filename)
+                self.scene_view.flipbook(self.viewport, fbs)
 
 
 dialog = ScreenShotsDialog()
