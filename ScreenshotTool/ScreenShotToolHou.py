@@ -9,6 +9,7 @@ class ScreenShotsDialog(QtWidgets.QDialog):
         super().__init__(parent)
         # Move to Build mode
         self.desktops_dict = dict((d.name(), d) for d in hou.ui.desktops())
+        self.original_desktop=hou.ui.curDesktop().name
         self.desktops_dict["Build"].setAsCurrent()
         self.scene_view=hou.ui.paneTabOfType(hou.paneTabType.SceneViewer)
         self.viewport = self.scene_view.curViewport()
@@ -57,6 +58,11 @@ class ScreenShotsDialog(QtWidgets.QDialog):
         self.uv.setChecked(True)
         self.gbGridLayout.addWidget(self.uv, 3, 1, 1, 1)
 
+        # self.nodes = QtWidgets.QCheckBox("Node Network", self.groupBox)
+        # self.nodes.setChecked(True)
+        # self.gbGridLayout.addWidget(self.nodes, 4, 0, 1, 1)
+
+
         # Add to main dialog
         self.gridLayout.addWidget(self.groupBox, 1, 0, 1, 2)
 
@@ -100,6 +106,9 @@ class ScreenShotsDialog(QtWidgets.QDialog):
         self.screenshot.pressed.connect(self.save_screenshots)
         self.gridLayout.addWidget(self.screenshot, 5, 1, 1, 1)
 
+    def closeEvent(self,event) :
+        self.desktops_dict[self.original_desktop].setAsCurrent()
+        super(ScreenShotsDialog, self).closeEvent(event)
 
     def save_screenshots(self):
         """This does all the work"""
@@ -137,7 +146,7 @@ class ScreenShotsDialog(QtWidgets.QDialog):
             "self.back.isChecked()",
             "self.right.isChecked()",
             "self.bottom.isChecked()",
-            "self.uv.isChecked()"            
+            "self.uv.isChecked()"
         ]
 
         views=[hou.geometryViewportType.Perspective,
@@ -173,8 +182,10 @@ class ScreenShotsDialog(QtWidgets.QDialog):
                 fbs.output(filename)
                 print(filename)
                 self.scene_view.flipbook(self.viewport, fbs)
+        self.done(0)
 
 
 dialog = ScreenShotsDialog()
+dialog.setParent(hou.qt.mainWindow(), QtCore.Qt.Window)
 dialog.show()
 
