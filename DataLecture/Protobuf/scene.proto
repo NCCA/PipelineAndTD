@@ -1,0 +1,25 @@
+syntax = "proto2";
+package NCCA;
+
+message Asset {
+  required string name = 1;
+  required int32 id = 2;
+  optional string description = 3;
+
+  enum AssetType {
+    FBX = 0;
+    USD = 1;
+    COLLADA = 2;
+  }
+
+  message MeshType {
+    required string location = 1;
+    optional AssetType type = 2 [default = USD];
+  }
+
+  repeated MeshType meshes = 4;
+}
+
+message Scene {
+  repeated Asset assets = 1;
+}
