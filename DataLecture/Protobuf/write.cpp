@@ -24,7 +24,6 @@ void addToScene(NCCA::Asset *_asset)
 
 
 
-  auto *mesh=_asset->add_meshes(); 
   
   while (true) 
   {
@@ -36,6 +35,8 @@ void addToScene(NCCA::Asset *_asset)
     {
       break;
     }
+    // not it is important to get this now once we have something to save, else we get error.
+    auto *mesh=_asset->add_meshes(); 
     mesh->set_location(location);
   }
 }

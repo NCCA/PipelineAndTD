@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import pprint
 import sys
 
 import scene_pb2
@@ -18,4 +19,4 @@ if __name__ == "__main__" :
     f = open(sys.argv[1], "rb")
     scene.ParseFromString(f.read())
     f.close()
-
+    pprint.pprint(scene)

@@ -24,3 +24,4 @@ target_link_libraries(write PRIVATE protobuf::libprotoc protobuf::libprotobuf pr
 add_executable(read read.cpp ${PROTO_SRCS} ${PROTO_HDRS})
 target_link_libraries(read PRIVATE protobuf::libprotoc protobuf::libprotobuf protobuf::libprotobuf-lite)
 
+add_custom_target(PythonBuild ALL DEPENDS read.py)
