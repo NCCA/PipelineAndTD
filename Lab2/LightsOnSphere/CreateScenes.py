@@ -1,4 +1,4 @@
-#!/usr/bin/env mayapy
+#!/opt/autodesk/maya/bin/mayapy
 
 import maya.standalone
 import maya.cmds as cmds
@@ -69,7 +69,7 @@ if __name__ == "__main__":
         cmds.file(f=True, new=True)
         cmds.file(rename="{}/{}.{}.ma".format(location, args.fname, i))
 
-        for i in range(0, random.randint(10, 200)):
+        for i in range(0, random.randint(10, args.maxlights)):
             x, y, z = random_point_on_sphere(14, hemisphere=True)
             name = randName()
             colour = random.choice(colours)
