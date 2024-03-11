@@ -1,0 +1,45 @@
+#usda 1.0
+
+def Xform "World"
+{
+  def Xform "Object"(
+    variants = {
+      # Try changing the shading variant to either "red", "green" or "blue":
+      string shadingVariant = "green"
+    }
+    prepend variantSets = "shadingVariant"
+  )
+  {
+    def "Cube" (references = @./cube-model.usda@</World/Cube>)
+    {
+      # Coordinates:
+      double3 xformOp:translate = (0.0, 0.0, 0.0)
+      double3 xformOp:rotateXYZ = (0.0, 45.0, 0.0)
+      float3 xformOp:scale = (1.0, 1.0, 1.0)
+      uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+     
+      # Colors (set by specifying the "shadingVariant" on the "Cube" above):
+      color3f[] primvars:displayColor
+    }
+
+    variantSet "shadingVariant" = {
+      "red" {
+        over "Cube" {
+          color3f[] primvars:displayColor = [(1.0, 0.0, 0.0)]
+        }
+      }
+
+      "green" {
+        over "Cube" {
+          color3f[] primvars:displayColor = [(0.0, 1.0, 0.0)]
+        }
+      }
+
+      "blue" {
+        over "Cube" {
+          color3f[] primvars:displayColor = [(0.0, 0.0, 1.0)]
+        }
+      }
+    }
+  }
+}
