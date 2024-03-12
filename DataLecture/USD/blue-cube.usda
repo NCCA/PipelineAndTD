@@ -1,11 +1,12 @@
 #usda 1.0
 
-over Xform "World" {
-  over Mesh "Cube" {
+over "World" {
+  over  "Cube" {
     # Try uncommenting additional properties to see the effect on the final
     # render, or adding new ones and see how it affects the scene:
     color3f[] primvars:displayColor = [(0.0, 0.0, 1.0)]
     # double3 xformOp:rotateXYZ = (45.0, 45.0, 0.0)
     # float3 xformOp:scale = (1.0, 2.0, 3.0)
+  
   }
 }
