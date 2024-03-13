@@ -17,7 +17,11 @@ int main(int argc, char **argv)
   Py_SetProgramName(program);  /* optional but recommended */
   Py_Initialize();
   PyRun_SimpleString("from time import time,ctime\n"
-                      "print('Today is', ctime(time()))\n");
+                     "import sys\n"
+                      "print('Today is', ctime(time()))\n"
+                      "for i in range(0,10) :\n"
+                      " print(f'{i=}')\n"
+                      "print(f'{sys.version}')");
   if (Py_FinalizeEx() < 0) 
   {
     std::cerr<<"Failed to exit python\n";

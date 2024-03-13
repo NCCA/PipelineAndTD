@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from pxr import Gf, Sdf, Usd, UsdGeom, UsdShade
-
+import random
 def _addGround(stage, width, depth):
     boxPrim = UsdGeom.Cube.Define(stage, "/World/ground")
     boxPrim.CreateDisplayColorAttr([(0.5, 0.2, 0.0)])
@@ -49,22 +49,33 @@ def _createMugs(stage, width, depth):
     payload_prim = UsdGeom.Xform.Define(stage, Sdf.Path("/World/CoffeeCup00")).GetPrim()
     # now load the file MugWithVariants.usda and place in scene
     _add_payload(payload_prim, r"./MugWithVariants.usda", Sdf.Path.emptyPath)
-    # Now make visible
-    prim = stage.GetPrimAtPath("/World/CoffeeCup00")
-    visibility_attribute = prim.GetAttribute("visibility")
-    visibility_attribute.Set("visible")
+    # # Now make visible
+    # prim = stage.GetPrimAtPath("/World/CoffeeCup00")
+    # visibility_attribute = prim.GetAttribute("visibility")
+    # visibility_attribute.Set("visible")
+    colours=["red","green","blue"]
+    sizes=["default","small","medium","large"]
+    primNumber=0
+    for i in range(-20,20,4):
+        for j in range(-20,20,4):
+            ## now add the payload
+            path=Sdf.Path(f"/World/CoffeeCup{primNumber}")
+            primNumber+=1
+            payload_prim = UsdGeom.Mesh.Define(stage,path ).GetPrim()
+            _add_payload(payload_prim, r"./MugWithVariants.usda", Sdf.Path.emptyPath)
+            mug=stage.GetPrimAtPath(path)
+            UsdGeom.XformCommonAPI(mug).SetTranslate((i,0.5,j))
+            #UsdGeom.XformCommonAPI(mug).SetScale((0.1,0.1,0.1))
+            # Set variant for colour
+            variant_set = mug.GetVariantSets().GetVariantSet("shadingVariant")
+            variant_set.SetVariantSelection(random.choice(colours))
 
-    
-    # for i in range(10):
-    #     for j in range(10):
-    #         ## now add the payload
-    #         payload_prim = UsdGeom.Xform.Define(stage, Sdf.Path(f"/World/CoffeeCup{i}{j}")).GetPrim()
-    #         _add_payload(payload_prim, r"./MugWithVariants.usda", Sdf.Path.emptyPath)
-    #         #refs.AddReference("/CoffeeCup")
-    #         #geo.CreateDisplayColorAttr([(0.5, 0.2, 0.0)])
-    #         #xformable = UsdGeom.Xformable(geo)
-    #         #xformable.AddTranslateOp().Set((i, 0.5, j))
-    #         #xformable.AddScaleOp().Set((0.5, 1.0, 0.5))
+            variant_set = mug.GetVariantSets().GetVariantSet("sizeVariant")
+            variant_set.SetVariantSelection(random.choice(sizes))
+
+            # xformable = UsdGeom.Xformable(mug)
+            # xformable.AddTranslateOp().Set((i, 0.5, j))
+            # xformable.AddScaleOp().Set((0.5, 1.0, 0.5))
             
 
 
@@ -73,9 +84,6 @@ def _createMugs(stage, width, depth):
             # refs = treeRefPrim.GetReferences()
             # refs.AddReference("/World/CoffeeCup")
             # mug.CreateDisplayColorAttr([(0.5, 0.2, 0.0)])
-            # xformable = UsdGeom.Xformable(mug)
-            # xformable.AddTranslateOp().Set((i, 0.5, j))
-            # xformable.AddScaleOp().Set((0.5, 1.0, 0.5))
 
 
 def main():

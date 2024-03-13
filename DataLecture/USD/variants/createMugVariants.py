@@ -3,7 +3,7 @@ from pxr import Usd, UsdGeom,Sdf
 
 stage = Usd.Stage.Open('Mug.usda')
 
-default_prim = UsdGeom.Xform.Define(stage, Sdf.Path("/CoffeeCup"))
+default_prim = UsdGeom.Mesh.Define(stage, Sdf.Path("/CoffeeCup"))
 stage.SetDefaultPrim(default_prim.GetPrim())
 
 # Clear local opinion, which always wins over variants.
@@ -46,26 +46,27 @@ vset.AddVariant('small')
 vset.AddVariant('medium')
 vset.AddVariant('large')
 
+vset.SetVariantSelection('default')
+with vset.GetVariantEditContext():
+    xformable = UsdGeom.Xformable(rootPrim)
+    xformable.AddScaleOp().Set((0.5, 0.5, 0.5))
 
 
 vset.SetVariantSelection('small')
 with vset.GetVariantEditContext():
     xformable = UsdGeom.Xformable(rootPrim)
-    xformable.AddTranslateOp().Set((0, 1.0, 0))
-    xformable.AddScaleOp().Set((0.5, 0.5, 0.5))
+    xformable.AddScaleOp().Set((0.1, 0.1, 0.1))
 
 vset.SetVariantSelection('medium')
 with vset.GetVariantEditContext():
     xformable = UsdGeom.Xformable(rootPrim)
-    xformable.AddTranslateOp().Set((0, 1.5, 0))
-    xformable.AddScaleOp().Set((1.5, 1.5, 1.5))
+    xformable.AddScaleOp().Set((0.3, 0.3, 0.3))
 
 
 vset.SetVariantSelection('large')
 with vset.GetVariantEditContext():
     xformable = UsdGeom.Xformable(rootPrim)
-    xformable.AddTranslateOp().Set((0, 2.5, 0))
-    xformable.AddScaleOp().Set((2.5, 2.5, 2.5))
+    xformable.AddScaleOp().Set((0.7, 0.7, 0.7))
 
 
 
