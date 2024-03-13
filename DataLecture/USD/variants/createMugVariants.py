@@ -15,13 +15,10 @@ colorAttr.Clear()
 rootPrim = stage.GetPrimAtPath('/CoffeeCup')
 vset = rootPrim.GetVariantSets().AddVariantSet('shadingVariant')
 
-
-
 # Create variant options.
 vset.AddVariant('red')
 vset.AddVariant('blue')
 vset.AddVariant('green')
-
 
 
 # Author red color behind red variant.
@@ -41,7 +38,6 @@ with vset.GetVariantEditContext():
 # now add size variants
 vset = rootPrim.GetVariantSets().AddVariantSet('sizeVariant')
 vset.AddVariant('default')
-
 vset.AddVariant('small')
 vset.AddVariant('medium')
 vset.AddVariant('large')
@@ -49,23 +45,28 @@ vset.AddVariant('large')
 vset.SetVariantSelection('default')
 with vset.GetVariantEditContext():
     xformable = UsdGeom.Xformable(rootPrim)
+    xformable.AddTranslateOp().Set((0.0, 1.1, 0.0))
     xformable.AddScaleOp().Set((0.2, 0.2, 0.2))
+    
 
 
 vset.SetVariantSelection('small')
 with vset.GetVariantEditContext():
     xformable = UsdGeom.Xformable(rootPrim)
+    xformable.AddTranslateOp().Set((0.0, 0.7, 0.0))
     xformable.AddScaleOp().Set((0.1, 0.1, 0.1))
 
 vset.SetVariantSelection('medium')
 with vset.GetVariantEditContext():
     xformable = UsdGeom.Xformable(rootPrim)
+    xformable.AddTranslateOp().Set((0.0, 1.6, 0.0))
     xformable.AddScaleOp().Set((0.3, 0.3, 0.3))
 
 
 vset.SetVariantSelection('large')
 with vset.GetVariantEditContext():
     xformable = UsdGeom.Xformable(rootPrim)
+    xformable.AddTranslateOp().Set((0.0, 2.2, 0.0))
     xformable.AddScaleOp().Set((0.4, 0.4, 0.4))
 
 

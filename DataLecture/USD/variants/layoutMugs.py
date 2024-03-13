@@ -2,10 +2,17 @@
 from pxr import Gf, Sdf, Usd, UsdGeom, UsdShade
 import random
 def _addGround(stage, width, depth):
-    boxPrim = UsdGeom.Cube.Define(stage, "/World/ground")
-    boxPrim.CreateDisplayColorAttr([(0.5, 0.2, 0.0)])
-    xformable = UsdGeom.Xformable(boxPrim)
-    xformable.AddScaleOp().Set(Gf.Vec3f(width, 0.1, depth))
+    boxPrim = UsdGeom.Mesh.Define(stage, "/World/Cube")
+    boxPrim.CreatePointsAttr().Set([(-width, 0, depth), (width, 0 ,depth), (width, 0, -depth), (-width, 0, -depth) ]) 
+    boxPrim.CreateFaceVertexCountsAttr().Set([4])
+    boxPrim.CreateFaceVertexIndicesAttr().Set([0, 1, 2,3])
+    boxPrim.CreateExtentAttr().Set([(-0.5, -0.5, -0.5), (0.5, 0.5, 0.5)])
+    boxPrim.CreateNormalsAttr().Set([(0, 0, 1)])
+
+    # boxPrim = UsdGeom.Cube.Define(stage, "/World/ground")
+    # boxPrim.CreateDisplayColorAttr([(0.5, 0.2, 0.0)])
+    # xformable = UsdGeom.Xformable(boxPrim)
+    # xformable.AddScaleOp().Set(Gf.Vec3f(width, 0.1, depth))
 
     mtl_path = Sdf.Path("/World/GroundMaterial")
     mtl = UsdShade.Material.Define(stage, mtl_path)
@@ -64,14 +71,20 @@ def _createMugs(stage, width, depth):
             payload_prim = UsdGeom.Mesh.Define(stage,path ).GetPrim()
             _add_payload(payload_prim, r"./MugWithVariants.usda", Sdf.Path.emptyPath)
             mug=stage.GetPrimAtPath(path)
-            UsdGeom.XformCommonAPI(mug).SetTranslate((i,0.5,j))
-            #UsdGeom.XformCommonAPI(mug).SetScale((0.1,0.1,0.1))
+
             # Set variant for colour
             variant_set = mug.GetVariantSets().GetVariantSet("shadingVariant")
             variant_set.SetVariantSelection(random.choice(colours))
 
             variant_set = mug.GetVariantSets().GetVariantSet("sizeVariant")
             variant_set.SetVariantSelection(random.choice(sizes))
+            xform = UsdGeom.Xformable(mug)
+            local_transform = xform.GetLocalTransformation()
+            translate = local_transform.ExtractTranslation()
+            UsdGeom.XformCommonAPI(mug).SetTranslate((i,translate[1],j))
+
+
+
 
             # xformable = UsdGeom.Xformable(mug)
             # xformable.AddTranslateOp().Set((i, 0.5, j))
@@ -91,7 +104,7 @@ def main():
     world = UsdGeom.Xform.Define(stage, "/World")
    
     #_addCamera(stage)
-    #_addGround(stage, 10, 10)
+    _addGround(stage, 30, 30)
     _createMugs(stage,10,10)
 
 
