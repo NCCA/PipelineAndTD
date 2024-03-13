@@ -49,7 +49,7 @@ vset.AddVariant('large')
 vset.SetVariantSelection('default')
 with vset.GetVariantEditContext():
     xformable = UsdGeom.Xformable(rootPrim)
-    xformable.AddScaleOp().Set((0.5, 0.5, 0.5))
+    xformable.AddScaleOp().Set((0.2, 0.2, 0.2))
 
 
 vset.SetVariantSelection('small')
@@ -66,7 +66,7 @@ with vset.GetVariantEditContext():
 vset.SetVariantSelection('large')
 with vset.GetVariantEditContext():
     xformable = UsdGeom.Xformable(rootPrim)
-    xformable.AddScaleOp().Set((0.7, 0.7, 0.7))
+    xformable.AddScaleOp().Set((0.4, 0.4, 0.4))
 
 
 
