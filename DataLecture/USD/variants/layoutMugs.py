@@ -42,9 +42,8 @@ def _addCamera(stage):
 
 
 def _add_payload(prim: Usd.Prim, payload_asset_path: str, payload_target_path: Sdf.Path) -> None:
-    #payloads: Usd.Payloads = prim.GetPayloads()
-    references: Usd.References = prim.GetReferences()
-    references.AddReference(
+    payloads: Usd.Payloads = prim.GetPayloads()
+    payloads.AddPayload(
         assetPath=payload_asset_path,
         #primPath=payload_target_path # OPTIONAL: Payload a specific target prim. Otherwise, uses the payloadd layer's defaultPrim.
     )
@@ -53,13 +52,11 @@ def _add_payload(prim: Usd.Prim, payload_asset_path: str, payload_target_path: S
 
 
 def _createMugs(stage, width, depth):
-    payload_prim = UsdGeom.Xform.Define(stage, Sdf.Path("/World/CoffeeCup00")).GetPrim()
+    payload_prim =  UsdGeom.Xform.Define(stage, Sdf.Path("/World")).GetPrim()
     # now load the file MugWithVariants.usda and place in scene
     _add_payload(payload_prim, r"./MugWithVariants.usda", Sdf.Path.emptyPath)
     # # Now make visible
-    # prim = stage.GetPrimAtPath("/World/CoffeeCup00")
-    # visibility_attribute = prim.GetAttribute("visibility")
-    # visibility_attribute.Set("visible")
+    prim = stage.GetPrimAtPath("/World/CoffeeCup00")
     colours=["red","green","blue"]
     sizes=["default","small","medium","large"]
     primNumber=0
@@ -100,15 +97,21 @@ def _createMugs(stage, width, depth):
 
 
 def main():
+
     stage = Usd.Stage.CreateNew("MugScene.usda")
+
     world = UsdGeom.Xform.Define(stage, "/World")
-   
-    #_addCamera(stage)
+    # set these to make usdchecker happy
+    stage.GetRootLayer().defaultPrim = 'World'   
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.y)
+    UsdGeom.SetStageMetersPerUnit(stage, 0.01) 
+    _addCamera(stage)
     _addGround(stage, 30, 30)
     _createMugs(stage,10,10)
 
 
     stage.GetRootLayer().Save()
+    
 
 
 if __name__ == "__main__":
