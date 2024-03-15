@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-from pxr import Usd, UsdGeom, Sdf
-
-
+from pxr import Sdf, Usd, UsdGeom
 
 
 def add_sub_layer(sub_layer_path: str, root_layer) -> Sdf.Layer:
@@ -10,11 +8,12 @@ def add_sub_layer(sub_layer_path: str, root_layer) -> Sdf.Layer:
     root_layer.subLayerPaths.append(sub_layer.identifier)
     return sub_layer
 
+
 # Open a stage for writing
-stage = Usd.Stage.CreateNew('layer-cube.usda')
+stage = Usd.Stage.CreateNew("layer-cube.usda")
 
 # Add the sub layer to the root layer
-root=stage.GetRootLayer()
+root = stage.GetRootLayer()
 add_sub_layer("./blue-cube.usda", root)
 add_sub_layer("./cube.usda", root)
 
@@ -23,5 +22,5 @@ add_sub_layer("./cube.usda", root)
 print(stage.GetRootLayer().ExportToString())
 
 # Save the resulting layer
-#stage.Export("layer-cube.usda", addSourceFileComment=False)
+# stage.Export("layer-cube.usda", addSourceFileComment=False)
 stage.GetRootLayer().Save()

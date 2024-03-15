@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from pxr import Usd, UsdGeom
 
+
 def position_prim(prim: Usd.Prim, translate: tuple) -> None:
     UsdGeom.XformCommonAPI(prim).SetTranslate(translate)
 
@@ -10,10 +11,10 @@ stage = Usd.Stage.CreateInMemory("Cube.usda")
 
 # Create a transform and add a Cube as mesh data
 xformPrim = UsdGeom.Xform.Define(stage, "/World")
-stage.GetRootLayer().defaultPrim = 'World'   
+stage.GetRootLayer().defaultPrim = "World"
 UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.y)
 # 1 unit == 1 meter
-UsdGeom.SetStageMetersPerUnit(stage, 1.0) 
+UsdGeom.SetStageMetersPerUnit(stage, 1.0)
 
 shapeMesh = UsdGeom.Sphere.Define(stage, "/World/Sphere")
 position_prim(shapeMesh.GetPrim(), (2, 0, 0))
@@ -33,20 +34,19 @@ position_prim(shapeMesh.GetPrim(), (-2, 0, -2))
 # a row of cylinders with different axis
 shapeMesh = UsdGeom.Cylinder.Define(stage, "/World/CylinderXAxis")
 position_prim(shapeMesh.GetPrim(), (-2, 0, -4))
-prim=shapeMesh.GetPrim()
+prim = shapeMesh.GetPrim()
 shapeMesh.CreateAxisAttr("X")
 
 
 shapeMesh = UsdGeom.Cylinder.Define(stage, "/World/CylinderYAxis")
 position_prim(shapeMesh.GetPrim(), (0, 0, -4))
-prim=shapeMesh.GetPrim()
+prim = shapeMesh.GetPrim()
 shapeMesh.CreateAxisAttr("Y")
 
 shapeMesh = UsdGeom.Cylinder.Define(stage, "/World/CylinderZAxis")
 position_prim(shapeMesh.GetPrim(), (2, 0, -4))
-prim=shapeMesh.GetPrim()
+prim = shapeMesh.GetPrim()
 shapeMesh.CreateAxisAttr("Z")
-
 
 
 # Print out the stage

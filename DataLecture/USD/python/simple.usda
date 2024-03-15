@@ -1,0 +1,605 @@
+#usda 1.0
+
+def "World"
+{
+    def Sphere "Sphere1"
+    {
+        double3 xformOp:translate = (-10, 0, -10)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere2"
+    {
+        double3 xformOp:translate = (-10, 0, -8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere3"
+    {
+        double3 xformOp:translate = (-10, 0, -6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere4"
+    {
+        double3 xformOp:translate = (-10, 0, -4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere5"
+    {
+        double3 xformOp:translate = (-10, 0, -2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere6"
+    {
+        double3 xformOp:translate = (-10, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere7"
+    {
+        double3 xformOp:translate = (-10, 0, 2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere8"
+    {
+        double3 xformOp:translate = (-10, 0, 4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere9"
+    {
+        double3 xformOp:translate = (-10, 0, 6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere10"
+    {
+        double3 xformOp:translate = (-10, 0, 8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere11"
+    {
+        double3 xformOp:translate = (-8, 0, -10)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere12"
+    {
+        double3 xformOp:translate = (-8, 0, -8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere13"
+    {
+        double3 xformOp:translate = (-8, 0, -6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere14"
+    {
+        double3 xformOp:translate = (-8, 0, -4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere15"
+    {
+        double3 xformOp:translate = (-8, 0, -2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere16"
+    {
+        double3 xformOp:translate = (-8, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere17"
+    {
+        double3 xformOp:translate = (-8, 0, 2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere18"
+    {
+        double3 xformOp:translate = (-8, 0, 4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere19"
+    {
+        double3 xformOp:translate = (-8, 0, 6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere20"
+    {
+        double3 xformOp:translate = (-8, 0, 8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere21"
+    {
+        double3 xformOp:translate = (-6, 0, -10)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere22"
+    {
+        double3 xformOp:translate = (-6, 0, -8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere23"
+    {
+        double3 xformOp:translate = (-6, 0, -6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere24"
+    {
+        double3 xformOp:translate = (-6, 0, -4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere25"
+    {
+        double3 xformOp:translate = (-6, 0, -2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere26"
+    {
+        double3 xformOp:translate = (-6, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere27"
+    {
+        double3 xformOp:translate = (-6, 0, 2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere28"
+    {
+        double3 xformOp:translate = (-6, 0, 4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere29"
+    {
+        double3 xformOp:translate = (-6, 0, 6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere30"
+    {
+        double3 xformOp:translate = (-6, 0, 8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere31"
+    {
+        double3 xformOp:translate = (-4, 0, -10)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere32"
+    {
+        double3 xformOp:translate = (-4, 0, -8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere33"
+    {
+        double3 xformOp:translate = (-4, 0, -6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere34"
+    {
+        double3 xformOp:translate = (-4, 0, -4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere35"
+    {
+        double3 xformOp:translate = (-4, 0, -2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere36"
+    {
+        double3 xformOp:translate = (-4, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere37"
+    {
+        double3 xformOp:translate = (-4, 0, 2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere38"
+    {
+        double3 xformOp:translate = (-4, 0, 4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere39"
+    {
+        double3 xformOp:translate = (-4, 0, 6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere40"
+    {
+        double3 xformOp:translate = (-4, 0, 8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere41"
+    {
+        double3 xformOp:translate = (-2, 0, -10)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere42"
+    {
+        double3 xformOp:translate = (-2, 0, -8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere43"
+    {
+        double3 xformOp:translate = (-2, 0, -6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere44"
+    {
+        double3 xformOp:translate = (-2, 0, -4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere45"
+    {
+        double3 xformOp:translate = (-2, 0, -2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere46"
+    {
+        double3 xformOp:translate = (-2, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere47"
+    {
+        double3 xformOp:translate = (-2, 0, 2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere48"
+    {
+        double3 xformOp:translate = (-2, 0, 4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere49"
+    {
+        double3 xformOp:translate = (-2, 0, 6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere50"
+    {
+        double3 xformOp:translate = (-2, 0, 8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere51"
+    {
+        double3 xformOp:translate = (0, 0, -10)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere52"
+    {
+        double3 xformOp:translate = (0, 0, -8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere53"
+    {
+        double3 xformOp:translate = (0, 0, -6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere54"
+    {
+        double3 xformOp:translate = (0, 0, -4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere55"
+    {
+        double3 xformOp:translate = (0, 0, -2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere56"
+    {
+        double3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere57"
+    {
+        double3 xformOp:translate = (0, 0, 2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere58"
+    {
+        double3 xformOp:translate = (0, 0, 4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere59"
+    {
+        double3 xformOp:translate = (0, 0, 6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere60"
+    {
+        double3 xformOp:translate = (0, 0, 8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere61"
+    {
+        double3 xformOp:translate = (2, 0, -10)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere62"
+    {
+        double3 xformOp:translate = (2, 0, -8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere63"
+    {
+        double3 xformOp:translate = (2, 0, -6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere64"
+    {
+        double3 xformOp:translate = (2, 0, -4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere65"
+    {
+        double3 xformOp:translate = (2, 0, -2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere66"
+    {
+        double3 xformOp:translate = (2, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere67"
+    {
+        double3 xformOp:translate = (2, 0, 2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere68"
+    {
+        double3 xformOp:translate = (2, 0, 4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere69"
+    {
+        double3 xformOp:translate = (2, 0, 6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere70"
+    {
+        double3 xformOp:translate = (2, 0, 8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere71"
+    {
+        double3 xformOp:translate = (4, 0, -10)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere72"
+    {
+        double3 xformOp:translate = (4, 0, -8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere73"
+    {
+        double3 xformOp:translate = (4, 0, -6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere74"
+    {
+        double3 xformOp:translate = (4, 0, -4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere75"
+    {
+        double3 xformOp:translate = (4, 0, -2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere76"
+    {
+        double3 xformOp:translate = (4, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere77"
+    {
+        double3 xformOp:translate = (4, 0, 2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere78"
+    {
+        double3 xformOp:translate = (4, 0, 4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere79"
+    {
+        double3 xformOp:translate = (4, 0, 6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere80"
+    {
+        double3 xformOp:translate = (4, 0, 8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere81"
+    {
+        double3 xformOp:translate = (6, 0, -10)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere82"
+    {
+        double3 xformOp:translate = (6, 0, -8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere83"
+    {
+        double3 xformOp:translate = (6, 0, -6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere84"
+    {
+        double3 xformOp:translate = (6, 0, -4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere85"
+    {
+        double3 xformOp:translate = (6, 0, -2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere86"
+    {
+        double3 xformOp:translate = (6, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere87"
+    {
+        double3 xformOp:translate = (6, 0, 2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere88"
+    {
+        double3 xformOp:translate = (6, 0, 4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere89"
+    {
+        double3 xformOp:translate = (6, 0, 6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere90"
+    {
+        double3 xformOp:translate = (6, 0, 8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere91"
+    {
+        double3 xformOp:translate = (8, 0, -10)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere92"
+    {
+        double3 xformOp:translate = (8, 0, -8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere93"
+    {
+        double3 xformOp:translate = (8, 0, -6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere94"
+    {
+        double3 xformOp:translate = (8, 0, -4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere95"
+    {
+        double3 xformOp:translate = (8, 0, -2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere96"
+    {
+        double3 xformOp:translate = (8, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere97"
+    {
+        double3 xformOp:translate = (8, 0, 2)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere98"
+    {
+        double3 xformOp:translate = (8, 0, 4)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere99"
+    {
+        double3 xformOp:translate = (8, 0, 6)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+
+    def Sphere "Sphere100"
+    {
+        double3 xformOp:translate = (8, 0, 8)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+}
+

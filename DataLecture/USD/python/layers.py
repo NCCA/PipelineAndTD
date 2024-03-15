@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-from pxr import Usd, UsdGeom,Sdf
-
+from pxr import Sdf, Usd, UsdGeom
 
 # Create a temporary stage in memory
 stage = Usd.Stage.CreateInMemory("stage.usda")

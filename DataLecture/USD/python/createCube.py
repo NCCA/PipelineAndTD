@@ -9,11 +9,26 @@ xformPrim = UsdGeom.Xform.Define(stage, "/World")
 
 
 prim = UsdGeom.Mesh.Define(stage, "/World/Cube")
-prim.CreatePointsAttr().Set([(-0.5, -0.5, 0.5), (0.5, -0.5, 0.5), (-0.5, 0.5, 0.5), (0.5, 0.5, 0.5), (-0.5, 0.5, -0.5), (0.5, 0.5, -0.5), (-0.5, -0.5, -0.5), (0.5, -0.5, -0.5)])
+prim.CreatePointsAttr().Set(
+    [
+        (-0.5, -0.5, 0.5),
+        (0.5, -0.5, 0.5),
+        (-0.5, 0.5, 0.5),
+        (0.5, 0.5, 0.5),
+        (-0.5, 0.5, -0.5),
+        (0.5, 0.5, -0.5),
+        (-0.5, -0.5, -0.5),
+        (0.5, -0.5, -0.5),
+    ]
+)
 prim.CreateFaceVertexCountsAttr().Set([4, 4, 4, 4, 4, 4])
-prim.CreateFaceVertexIndicesAttr().Set([0, 1, 3, 2, 2, 3, 5, 4, 4, 5, 7, 6, 6, 7, 1, 0, 1, 7, 5, 3, 6, 0, 2, 4])
+prim.CreateFaceVertexIndicesAttr().Set(
+    [0, 1, 3, 2, 2, 3, 5, 4, 4, 5, 7, 6, 6, 7, 1, 0, 1, 7, 5, 3, 6, 0, 2, 4]
+)
 prim.CreateExtentAttr().Set([(-0.5, -0.5, -0.5), (0.5, 0.5, 0.5)])
-prim.CreateNormalsAttr().Set([(0, 0, 1), (0, 0, -1), (0, 1, 0), (0, -1, 0), (1, 0, 0), (-1, 0, 0)])
+prim.CreateNormalsAttr().Set(
+    [(0, 0, 1), (0, 0, -1), (0, 1, 0), (0, -1, 0), (1, 0, 0), (-1, 0, 0)]
+)
 
 # Set the color of the cube
 colorAttr = prim.GetDisplayColorAttr()

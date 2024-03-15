@@ -19,7 +19,7 @@ cube = stage.GetPrimAtPath("/Cube/MeshData")
 size = cubePrim.GetSizeAttr()
 
 # Access the cube schema to set the color
-colorAttr =cubePrim.GetDisplayColorAttr()
+colorAttr = cubePrim.GetDisplayColorAttr()
 
 size.Set(2.9)
 
