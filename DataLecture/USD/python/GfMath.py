@@ -50,6 +50,6 @@ print(quat.GetNormalized())
 print(quat.GetConjugate())
 print(quat.Transform(Gf.Vec3h(1, 2, 3)))
 
-rot=Gf.Rotation(Gf.Vec3d(0, 0, 1), 45.0)
+rot = Gf.Rotation(Gf.Vec3d(0, 0, 1), 45.0)
 print(rot)
 print(rot.GetQuaternion())

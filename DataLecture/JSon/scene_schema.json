@@ -1,0 +1,85 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "",
+    "title": "Simple Scene",
+    "description": "A Simple cross platform scene schema",
+    "type": "object",
+    "properties": {
+      "scene_name": {
+        "type": "string",
+        "description": "The name of the scene"
+      },
+      "meshes": {
+        "type": "array",
+        "description": "The meshes in the scene",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The name of the mesh"
+            },
+            "path": {
+              "path": "string",
+              "description": "the location of the mesh"
+            },
+            "position": {
+              "type": "object",
+              "description": "The position of the mesh",
+              "properties": {
+                "x": {
+                  "type": "number",
+                  "description": "The x position of the mesh"
+                },
+                "y": {
+                  "type": "number",
+                  "description": "The y position of the mesh"
+                },
+                "z": {
+                  "type": "number",
+                  "description": "The z position of the mesh"
+                }
+              }
+            },
+            "rotation": {
+              "type": "object",
+              "description": "The rotation of the mesh",
+              "properties": {
+                "x": {
+                  "type": "number",
+                  "description": "The x rotation of the mesh"
+                },
+                "y": {
+                  "type": "number",
+                  "description": "The y rotation of the mesh"
+                },
+                "z": {
+                  "type": "number",
+                  "description": "The z rotation of the mesh"
+                }
+              }
+            },
+            "scale": {
+              "type": "object",
+              "description": "The scale of the mesh",
+              "properties": {
+                "x": {
+                  "type": "number",
+                  "description": "The x scale of the mesh"
+                },
+                "y": {
+                  "type": "number",
+                  "description": "The y scale of the mesh"
+                },
+                "z": {
+                  "type": "number",
+                  "description": "The z scale of the mesh"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "required": ["scene_name", "meshes"]
+  }

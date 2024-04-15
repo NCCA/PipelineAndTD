@@ -17,14 +17,15 @@ def random_point_on_sphere(radius=1, hemisphere=False):
     return Gf.Vec3f(x, y, z)
 
 
-def random_point(extents : int =10)->Gf.Vec3f:
+def random_point(extents: int = 10) -> Gf.Vec3f:
     return Gf.Vec3f(
         random.uniform(-extents, extents),
         random.uniform(-extents, extents),
         random.uniform(-extents, extents),
     )
 
-num_frames  = 250
+
+num_frames = 250
 # Create a temporary stage in memory
 stage = Usd.Stage.CreateInMemory("points.usda")
 stage.SetStartTimeCode(0)
@@ -43,15 +44,18 @@ num_particles = 10000
 points = [random_point_on_sphere(10) for _ in range(num_particles)]
 pointsPrim.CreatePointsAttr().Set(points, time=0)
 # create primvar colours for each point
-colors = [Gf.Vec3f(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)) for _ in range(num_particles)]
-#pointsPrim.CreateDisplayColorPrimvar(pointsPrim,colors,interpolation=UsdGeom.Tokens.vertex)
+colors = [
+    Gf.Vec3f(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
+    for _ in range(num_particles)
+]
+# pointsPrim.CreateDisplayColorPrimvar(pointsPrim,colors,interpolation=UsdGeom.Tokens.vertex)
 pointsPrim.CreateDisplayColorPrimvar("varying").Set(colors)
 
-#colourAttr = pointsPrim.GetDisplayColorAttr()
-#colourAttr.setVariability(UsdGeom.Tokens.varying)
+# colourAttr = pointsPrim.GetDisplayColorAttr()
+# colourAttr.setVariability(UsdGeom.Tokens.varying)
 # set interpolation to vertex
 
-pointsPrim.CreateWidthsAttr().Set([random.uniform(0.05,0.1)] * num_particles)
+pointsPrim.CreateWidthsAttr().Set([random.uniform(0.05, 0.1)] * num_particles)
 # negate so we can point to the 0,0,0 origin
 directions = [-p for p in points]
 
@@ -60,12 +64,12 @@ directions = [-p for p in points]
 for i in range(len(directions)):
     directions[i].Normalize()
 
-directions = [p*random.uniform(0.01,0.1) for p in directions]
+directions = [p * random.uniform(0.01, 0.1) for p in directions]
 # now calculate p*dir for each of the points and directions
 new_points = [p + d for p, d in zip(points, directions)]
 
-for frame in range(1,num_frames) :
-    pointsPrim.CreatePointsAttr().Set(new_points,time=frame)
+for frame in range(1, num_frames):
+    pointsPrim.CreatePointsAttr().Set(new_points, time=frame)
     new_points = [p + d for p, d in zip(new_points, directions)]
 
 
@@ -73,4 +77,4 @@ for frame in range(1,num_frames) :
 # print(stage.GetRootLayer().ExportToString())
 
 # Save the resulting layer
-stage.Export("points.usda", addSourceFileComment=True)
+stage.Export("points.usdc", addSourceFileComment=True)

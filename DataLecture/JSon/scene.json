@@ -1,0 +1,14 @@
+{
+    "scene_name": "test_scene",
+    "meshes": [
+        {
+            "name": "test_mesh",
+            "path": "1.obj",
+            "position": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            }
+        }
+    ]
+}

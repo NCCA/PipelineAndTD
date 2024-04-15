@@ -3,10 +3,8 @@ from pxr import Usd, UsdGeom
 
 # Create a temporary stage in memory
 stage = Usd.Stage.CreateInMemory("Cube.usda")
-
 # Create a transform and add a Cube as mesh data
 xformPrim = UsdGeom.Xform.Define(stage, "/Cube")
-
 # Set a translation
 UsdGeom.XformCommonAPI(xformPrim).SetTranslate((0, 0, 0))
 
