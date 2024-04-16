@@ -11,7 +11,7 @@ class Sphere
 
   public:
     /// @brief default ctor
-    inline Sphere(){;}
+    Sphere()=default;
     /// @brief user defined ctor
     /// @param _name the name of the sphere
     /// @param _x the x position
@@ -26,15 +26,15 @@ class Sphere
 
   private :
     /// @brief the name of the sphere
-    std::string m_name;
+    std::string m_name="";
     /// @brief the x position
-    float m_x;
+    float m_x=0.0f;
     /// @brief the y position
-    float m_y;
+    float m_y=0.0f;
     /// @brief the z position
-    float m_z;
+    float m_z=0.0f;
     /// @brief the radius
-    double m_radius;
+    double m_radius=1.0f;
     // @brief When the class Archive corresponds to an output archive, the
     // & operator is defined similar to <<.  Likewise, when the class Archive
     // is a type of input archive the & operator is defined similar to >>.

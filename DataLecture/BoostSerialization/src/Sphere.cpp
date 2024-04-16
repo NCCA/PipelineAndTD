@@ -1,13 +1,10 @@
 #include "Sphere.h"
 
 
-Sphere::Sphere() :  m_name(_name),
-                    m_x(_x),
-                    m_y(_y),
-                    m_z(_z),
-                    m_radius(_rad)
-                    {;}
-
+Sphere::Sphere(std::string _name, float _x,float _y, float _z, double _rad)
+  :m_name(_name),m_x(_x),m_y(_y),m_z(_z),m_radius(_rad)
+{
+}
 
 std::ostream & operator<<(std::ostream &_os, const Sphere &_s )
 {
