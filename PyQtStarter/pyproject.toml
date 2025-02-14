@@ -1,0 +1,6 @@
+[project]
+name = "pyqtstarter"
+version = "0.1.0"
+description = "Minimal PyQt6 Project"
+requires-python = ">=3.11"
+dependencies = ["PyQt6"]

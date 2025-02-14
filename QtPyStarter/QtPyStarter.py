@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import sys
-from PySide6 import QtCore,QtWidgets
+from qtpy import QtCore,QtWidgets
 
 
 
