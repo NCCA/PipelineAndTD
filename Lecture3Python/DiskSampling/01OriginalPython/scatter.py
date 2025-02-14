@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import random
 import Poisson as ps
 import matplotlib.pyplot as plt
 from datetime import datetime

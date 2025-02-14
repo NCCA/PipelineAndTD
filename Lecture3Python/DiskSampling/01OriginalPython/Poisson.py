@@ -20,7 +20,7 @@ class PoissonDisc():
         self.a = r/np.sqrt(2)
         # Number of cells in the x- and y-directions of the grid
         self.nx, self.ny = int(width / self.a) + 1, int(height / self.a) + 1
-        if seed !=None :
+        if seed is not None :
           np.random.seed(seed)
         self.reset()
 
@@ -31,7 +31,7 @@ class PoissonDisc():
 
     def reset(self,seed=None):
         """Reset the cells dictionary."""
-        if seed !=None :
+        if seed is not None :
           np.random.seed(seed)
         # A list of coordinates in the grid of cells
         coords_list = [(ix, iy) for ix in range(self.nx)
