@@ -1,0 +1,7 @@
+[project]
+name = "houdinipackage"
+version = "0.1.0"
+description = "demo in using houdini packages"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []

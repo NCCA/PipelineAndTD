@@ -20,7 +20,7 @@ houdini_locations = {
 }
 ```
 
-The core installation in this demo sets only two core package elements "load_package_one" and the env array which contains dictionary elements with the key and value pairs for the environment variables.
+The core installation in this demo sets only two core package elements "load_package_once" and the env array which contains dictionary elements with the key and value pairs for the environment variables.
 
 
 ```json
