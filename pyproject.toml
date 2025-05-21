@@ -13,5 +13,17 @@ dependencies = [
 ]
 
 [tool.uv.workspace]
-members = ["HoudiniPackage", "Lab3","DataLecture/*"]
-exclude = ["Lab2","DataLecture/Protobuf","DataLecture/BoostSerialization","DataLecture/USD","DataLecture/Export"]
+members = ["HoudiniPackage",
+"Lab3","DataLecture/*",
+"Lecture3/DiskSampling/*",
+]
+
+exclude = ["Lab2",
+"DataLecture/Protobuf","DataLecture/BoostSerialization",
+"DataLecture/USD","DataLecture/Export",
+"Lecture3PythonEmbed1/",
+"Lecture3Python/Extend1",
+"Lecture3Python/File",
+"Lecture3Python/DiskSampling/02CPPVersion",
+"Lecture3Python/DiskSampling/common",
+]

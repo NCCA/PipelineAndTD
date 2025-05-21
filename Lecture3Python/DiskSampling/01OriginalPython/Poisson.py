@@ -1,4 +1,5 @@
 import numpy as np
+
 # This is modified from the examples here https://github.com/scipython/scipython-maths/tree/master/poisson_disc_sampled_noise
 # For mathematical details of this algorithm, please see the blog
 # article at https://scipython.com/blog/poisson-disc-sampling-in-python/
@@ -6,40 +7,37 @@ import numpy as np
 # Also see https://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph07-poissondisk.pdf
 
 
-
-
-class PoissonDisc():
+class PoissonDisc:
     """A class for generating two-dimensional Possion (blue) noise)."""
 
     def __init__(self, width=50, height=50, r=1, k=30, seed=None):
         self.width, self.height = width, height
         self.r = r
         self.k = k
-        self.samples=[]
+        self.samples = []
         # Cell side length
-        self.a = r/np.sqrt(2)
+        self.a = r / np.sqrt(2)
         # Number of cells in the x- and y-directions of the grid
         self.nx, self.ny = int(width / self.a) + 1, int(height / self.a) + 1
-        if seed is not None :
-          np.random.seed(seed)
+        if seed is not None:
+            np.random.seed(seed)
         self.reset()
 
     def __iter__(self):
-      ''' return an iterator to the points item'''
-      return iter(self.samples)
+        """return an iterator to the points item"""
+        return iter(self.samples)
 
-
-    def reset(self,seed=None):
+    def reset(self, seed=None):
         """Reset the cells dictionary."""
-        if seed is not None :
-          np.random.seed(seed)
+        if seed is not None:
+            np.random.seed(seed)
         # A list of coordinates in the grid of cells
-        coords_list = [(ix, iy) for ix in range(self.nx)
-                                for iy in range(self.ny)]
+        coords_list = [(ix, iy) for ix in range(self.nx) for iy in range(self.ny)]
         # Initilalize the dictionary of cells: each key is a cell's coordinates
         # the corresponding value is the index of that cell's point's
         # coordinates in the samples list (or None if the cell is empty).
         self.cells = {coords: None for coords in coords_list}
+
     def _getCellCoords(self, pt):
         """Get the coordinates of the cell that pt = (x,y) falls in."""
 
@@ -56,15 +54,34 @@ class PoissonDisc():
                                     ooooo
                                      ooo
         """
-        
-        dxdy = ((-1,-2),(0,-2),(1,-2),(-2,-1),(-1,-1),(0,-1),(1,-1),(2,-1),
-                (-2,0),(-1,0),(1,0),(2,0),(-2,1),(-1,1),(0,1),(1,1),(2,1),
-                (-1,2),(0,2),(1,2),(0,0))
+
+        dxdy = (
+            (-1, -2),
+            (0, -2),
+            (1, -2),
+            (-2, -1),
+            (-1, -1),
+            (0, -1),
+            (1, -1),
+            (2, -1),
+            (-2, 0),
+            (-1, 0),
+            (1, 0),
+            (2, 0),
+            (-2, 1),
+            (-1, 1),
+            (0, 1),
+            (1, 1),
+            (2, 1),
+            (-1, 2),
+            (0, 2),
+            (1, 2),
+            (0, 0),
+        )
         neighbours = []
         for dx, dy in dxdy:
             neighbour_coords = coords[0] + dx, coords[1] + dy
-            if not (0 <= neighbour_coords[0] < self.nx and
-                    0 <= neighbour_coords[1] < self.ny):
+            if not (0 <= neighbour_coords[0] < self.nx and 0 <= neighbour_coords[1] < self.ny):
                 # We're off the grid: no neighbours here.
                 continue
             neighbour_cell = self.cells[neighbour_coords]
@@ -81,13 +98,13 @@ class PoissonDisc():
         for idx in self._getNeighbours(cell_coords):
             nearby_pt = self.samples[idx]
             # Squared distance between candidate point, pt, and this nearby_pt.
-            distance2 = (nearby_pt[0]-pt[0])**2 + (nearby_pt[1]-pt[1])**2
+            distance2 = (nearby_pt[0] - pt[0]) ** 2 + (nearby_pt[1] - pt[1]) ** 2
             if distance2 < self.r**2:
                 # The points are too close, so pt is not a candidate.
                 return False
         # All points tested: if we're here, pt is valid
         return True
-    
+
     def _getPoint(self, refpt):
         """Try to find a candidate point near refpt to emit in the sample.
         We draw up to k points from the annulus of inner radius r, outer radius
@@ -98,9 +115,8 @@ class PoissonDisc():
 
         i = 0
         while i < self.k:
-            rho, theta = (np.random.uniform(self.r, 2*self.r),
-                          np.random.uniform(0, 2*np.pi))
-            pt = refpt[0] + rho*np.cos(theta), refpt[1] + rho*np.sin(theta)
+            rho, theta = (np.random.uniform(self.r, 2 * self.r), np.random.uniform(0, 2 * np.pi))
+            pt = refpt[0] + rho * np.cos(theta), refpt[1] + rho * np.sin(theta)
             if not (0 <= pt[0] < self.width and 0 <= pt[1] < self.height):
                 # This point falls outside the domain, so try again.
                 continue
@@ -119,8 +135,7 @@ class PoissonDisc():
         """
 
         # Pick a random point to start with.
-        pt = (np.random.uniform(0, self.width),
-              np.random.uniform(0, self.height))
+        pt = (np.random.uniform(0, self.width), np.random.uniform(0, self.height))
         self.samples = [pt]
         # Our first sample is indexed at 0 in the samples list...
         self.cells[self._getCellCoords(pt)] = 0
@@ -147,4 +162,4 @@ class PoissonDisc():
                 # remove it from the list of "active" points.
                 active.remove(idx)
 
-        return self.samples     
+        return self.samples

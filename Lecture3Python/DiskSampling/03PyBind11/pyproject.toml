@@ -1,5 +1,5 @@
 [project]
-name = "03PyBind"
+name = "PyBind11"
 version = "0.1.0"
 description = "Simple Possion disc scatter"
 readme = "README.md"
