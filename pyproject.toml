@@ -13,4 +13,5 @@ dependencies = [
 ]
 
 [tool.uv.workspace]
-members=["HoudiniPackage"]
+members = ["HoudiniPackage", "Lab3","DataLecture/*"]
+exclude = ["Lab2","DataLecture/Protobuf","DataLecture/BoostSerialization","DataLecture/USD","DataLecture/Export"]

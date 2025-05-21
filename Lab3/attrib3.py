@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env -S uv run --script
 
 
 def static_vars(**kwargs):
@@ -6,10 +6,12 @@ def static_vars(**kwargs):
         for k in kwargs:
             setattr(func, k, kwargs[k])
         return func
+
     return decorate
 
+
 # This function uses attributes
-@static_vars(a=0,b=0)
+@static_vars(a=0, b=0)
 def static_func():
     print(f"value a={static_func.a} b={static_func.b}")
     static_func.a += 1
