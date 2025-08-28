@@ -16,6 +16,7 @@ dependencies = [
 members = ["HoudiniPackage",
 "Lab3","DataLecture/*",
 "Lecture3/DiskSampling/*",
+"PySideGuiTesting/*"
 ]
 
 exclude = ["Lab2",
@@ -26,4 +27,9 @@ exclude = ["Lab2",
 "Lecture3Python/File",
 "Lecture3Python/DiskSampling/02CPPVersion",
 "Lecture3Python/DiskSampling/common",
+]
+
+[dependency-groups]
+dev = [
+    "pytest-qt>=4.5.0",
 ]
