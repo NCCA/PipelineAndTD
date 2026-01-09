@@ -1,7 +1,0 @@
-[project]
-name = "pysidestarter"
-version = "0.1.0"
-description = "Simple PySide6 starter code"
-readme = "README.md"
-requires-python = ">=3.11"
-dependencies = ["PySide6"]

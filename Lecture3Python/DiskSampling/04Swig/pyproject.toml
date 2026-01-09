@@ -1,7 +1,0 @@
-[project]
-name = "04SWIG"
-version = "0.1.0"
-description = "Simple Possion disc scatter"
-readme = "README.md"
-requires-python = ">=3.11"
-dependencies = ["numpy", "matplotlib", "pyside6"]

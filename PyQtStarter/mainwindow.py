@@ -1,19 +1,8 @@
-#!/usr/bin/env python
-try:  #  support either PyQt5 or 6
-    from PyQt5 import uic
-    from PyQt5.QtCore import *
-    from PyQt5.QtWidgets import QApplication, QMainWindow
-
-    PyQtVersion = 5
-except ImportError:
-    print("trying Qt6")
-    from PyQt6 import uic
-    from PyQt6.QtCore import QEvent, Qt, QTimer
-    from PyQt6.QtWidgets import QApplication, QMainWindow
-
-    PyQtVersion = 6
-
+#!/usr/bin/env -S uv run --active --script
 import sys
+
+from PyQt6 import uic
+from PyQt6.QtWidgets import QApplication, QMainWindow
 
 
 class MainWindow(QMainWindow):

@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env -S uv run --script
 import math
 import random
 
-from pxr import Gf, Usd, UsdGeom, Sdf
+from pxr import Gf, Sdf, Usd, UsdGeom
 
 
 def random_point_on_sphere(radius=1, hemisphere=False):
@@ -63,18 +63,12 @@ proto_attr = instancer.CreateProtoIndicesAttr()
 proto_attr.Set([0] * num_particles, time=0)
 # Orientation is a local orientation for each instance based on a half Quaternion
 orientation = instancer.CreateOrientationsAttr()
-rotations = [
-    Gf.Quath(Gf.Rotation(Gf.Vec3d(1, 1, 1), random.uniform(0, 360)).GetQuat())
-    for _ in range(num_particles)
-]
+rotations = [Gf.Quath(Gf.Rotation(Gf.Vec3d(1, 1, 1), random.uniform(0, 360)).GetQuat()) for _ in range(num_particles)]
 orientation.Set(rotations, time=0)
 
 
 # # create primvar colours for each instance
-colors = [
-    Gf.Vec3f(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
-    for _ in range(num_particles)
-]
+colors = [Gf.Vec3f(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)) for _ in range(num_particles)]
 primvar_api = UsdGeom.PrimvarsAPI(instancer)
 primvar = primvar_api.CreatePrimvar("displayColor", Sdf.ValueTypeNames.Color3fArray)
 primvar.Set(colors)
@@ -91,11 +85,11 @@ for i in range(len(directions)):
 directions = [p * random.uniform(0.01, 0.1) for p in directions]
 
 # now calculate p+dir for each of the points and directions
-new_points = [p + d for p, d in zip(points, directions)]
+new_points = [p + d for p, d in zip(points, directions, strict=False)]
 
 for frame in range(1, num_frames):
     positions_attr.Set(new_points, time=frame)
-    new_points = [p + d for p, d in zip(new_points, directions)]
+    new_points = [p + d for p, d in zip(new_points, directions, strict=False)]
     for i in range(len(rotations)):
         # update each current rotation by a small amount
         rotations[i] *= Gf.Quath(Gf.Rotation(Gf.Vec3d(1, 1, 1), 5.0).GetQuat())

@@ -1,0 +1,23 @@
+{
+    "description": "The meshes in the scene",
+    "items": [
+        {
+            "name": "Mesh1",
+            "path": "/path/to/mesh1",
+            "position": {
+                "x": 1.0,
+                "y": 2.0,
+                "z": 3.0
+            }
+        },
+        {
+            "name": "Mesh2",
+            "path": "/path/to/mesh2",
+            "position": {
+                "x": 4.0,
+                "y": 5.0,
+                "z": 6.0
+            }
+        }
+    ]
+}

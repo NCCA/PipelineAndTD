@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env -S uv run --script
 import math
 import random
 
@@ -44,10 +44,7 @@ num_particles = 10000
 points = [random_point_on_sphere(10) for _ in range(num_particles)]
 pointsPrim.CreatePointsAttr().Set(points, time=0)
 # create primvar colours for each point
-colors = [
-    Gf.Vec3f(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
-    for _ in range(num_particles)
-]
+colors = [Gf.Vec3f(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1)) for _ in range(num_particles)]
 # pointsPrim.CreateDisplayColorPrimvar(pointsPrim,colors,interpolation=UsdGeom.Tokens.vertex)
 pointsPrim.CreateDisplayColorPrimvar("varying").Set(colors)
 
@@ -66,11 +63,11 @@ for i in range(len(directions)):
 
 directions = [p * random.uniform(0.01, 0.1) for p in directions]
 # now calculate p*dir for each of the points and directions
-new_points = [p + d for p, d in zip(points, directions)]
+new_points = [p + d for p, d in zip(points, directions, strict=False)]
 
 for frame in range(1, num_frames):
     pointsPrim.CreatePointsAttr().Set(new_points, time=frame)
-    new_points = [p + d for p, d in zip(new_points, directions)]
+    new_points = [p + d for p, d in zip(new_points, directions, strict=False)]
 
 
 # Print out the stage

@@ -1,6 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env -S uv run --script
 from pxr import Usd, UsdGeom
-
 
 # Open a stage for writing
 stage = Usd.Stage.CreateNew("simple.usda")
