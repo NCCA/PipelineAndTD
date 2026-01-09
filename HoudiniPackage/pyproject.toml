@@ -1,8 +1,0 @@
-[project]
-name = "HoudiniPackage"
-version = "0.1.0"
-description = "All of the code used in Pipeline and TD"
-readme = "README.md"
-requires-python = ">=3.11"
-dependencies = [
-]

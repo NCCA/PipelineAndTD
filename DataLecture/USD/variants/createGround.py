@@ -1,7 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env -S uv run --script
 
-
-from pxr import Usd,Sdf, UsdGeom
+from pxr import Sdf, Usd, UsdGeom
 
 stage: Usd.Stage = Usd.Stage.CreateInMemory()
 UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.y)
@@ -12,9 +11,9 @@ xformPrim = UsdGeom.Xform.Define(stage, "/World")
 
 
 prim = UsdGeom.Mesh.Define(stage, "/World/Cube")
-prim.CreatePointsAttr().Set([(-1, 0, 1), (1, 0 ,1), (1, 0, -1), (-1, 0, -1) ]) 
+prim.CreatePointsAttr().Set([(-1, 0, 1), (1, 0, 1), (1, 0, -1), (-1, 0, -1)])
 prim.CreateFaceVertexCountsAttr().Set([4])
-prim.CreateFaceVertexIndicesAttr().Set([0, 1, 2,3])
+prim.CreateFaceVertexIndicesAttr().Set([0, 1, 2, 3])
 prim.CreateExtentAttr().Set([(-0.5, -0.5, -0.5), (0.5, 0.5, 0.5)])
 prim.CreateNormalsAttr().Set([(0, 0, 1)])
 

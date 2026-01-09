@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env -S uv run --script
 from pxr import Sdf, Usd, UsdGeom
 
 # Create a temporary stage in memory

@@ -1,3 +1,5 @@
+*.usd*
+*.ma*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

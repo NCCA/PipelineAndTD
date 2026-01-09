@@ -1,9 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env -S uv run --script
 import math
 import random
 
 from pxr import Gf, Usd, UsdGeom
-
 
 # Create a temporary stage in memory
 stage = Usd.Stage.CreateInMemory("curves.usda")

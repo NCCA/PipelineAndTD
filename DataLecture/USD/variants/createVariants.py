@@ -1,12 +1,13 @@
-#!/usr/bin/env python
-
+#!/usr/bin/env -S uv run --script
 from pxr import Usd
 
+
 def create_variant_set(prim: Usd.Prim, variant_set_name: str, variants: list) -> Usd.VariantSet:
-    variant_set = prim.GetVariantSets().AddVariantSet(variant_set_name) 
+    variant_set = prim.GetVariantSets().AddVariantSet(variant_set_name)
     for variant in variants:
         variant_set.AddVariant(variant)
     return variant_set
+
 
 #############
 # Full Usage
