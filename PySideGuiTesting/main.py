@@ -1,5 +1,7 @@
-from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel
 import sys
+
+from PySide6.QtWidgets import QApplication, QLabel, QPushButton, QVBoxLayout, QWidget
+
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -19,6 +21,7 @@ class MainWindow(QWidget):
 
     def on_button_click(self):
         self.label.setText("Button was clicked!")
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
