@@ -1,0 +1,14 @@
+Display "teapot.@FRAME.exr" "file" "rgba"
+Format 720 575 1
+Projection "perspective" "fov" 45
+Translate 0 -0.5 3
+
+WorldBegin
+    TransformBegin
+        Translate 0 -0.2 0
+        Scale 0.3 0.3 0.3
+        Rotate -90 1 0 0
+        Rotate @ROTATION 0 0 1
+        Geometry "teapot"
+    TransformEnd
+WorldEnd
