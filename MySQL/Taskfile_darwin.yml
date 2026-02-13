@@ -3,7 +3,7 @@ version: "3"
 # most tasks will run from the Task root directory, but the lint is run from the current directory
 
 tasks:
-  create_image:
+  create-image:
     cmds:
       - podman pull mysql
       - |

@@ -22,3 +22,13 @@ tasks:
   user-login:
     cmds:
       - podman exec -it mysql_container mysql -u dbuser -pdbuser
+
+  create-db:
+    cmds:
+      - podman exec -i mysql_container mysql -u root -prootpass  < CreateDB.sql
+
+  clean-all:
+    cmds:
+      - podman stop mysql_container
+      - podman rm mysql_container
+      - rm -rf mysql_data
