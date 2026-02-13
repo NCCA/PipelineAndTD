@@ -1,0 +1,20 @@
+version: "3"
+
+# most tasks will run from the Task root directory, but the lint is run from the current directory
+
+tasks:
+  create_image:
+    cmds:
+      - podman pull mysql
+      - |
+        podman run -d \
+          --replace \
+          --security-opt label=disable \
+          --name mysql_container \
+          -e MYSQL_ROOT_PASSWORD=rootpass \
+          -e MYSQL_DATABASE=mydb \
+          -e MYSQL_USER=dbuser \
+          -e MYSQL_PASSWORD=dbuser \
+          -p 3306:3306 \
+          -v mysql_data:/transfer/mysql \
+          mysql:latest

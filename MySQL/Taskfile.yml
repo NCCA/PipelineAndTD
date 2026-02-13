@@ -1,0 +1,24 @@
+version: "3"
+
+includes:
+  platform:
+    taskfile: "./Taskfile_{{OS}}.yml"
+    optional: true
+    flatten: true
+
+tasks:
+  start:
+    cmds:
+      - podman start mysql_container
+
+  stop:
+    cmds:
+      - podman stop mysql_container
+
+  root-login:
+    cmds:
+      - podman exec -it mysql_container mysql -u root -p
+
+  user-login:
+    cmds:
+      - podman exec -it mysql_container mysql -u dbuser -pdbuser
