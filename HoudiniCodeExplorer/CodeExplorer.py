@@ -329,11 +329,13 @@ class CodeExplorerDialog(QtWidgets.QDialog):
             code = node.asCode(
                 brief=not verbose,
                 recurse=False,
-                save_box_contents=False,
                 save_channels_only=False,
                 save_creation_commands=True,
-                save_flags=True,
-                save_extra_flags=False,
+                save_keys_in_frames=False,
+                save_outgoing_wires=False,
+                save_parm_values_only=False,
+                save_spare_parms=True,
+                save_box_membership=True,
             )
             self._editor.setPlainText(code)
             self._status_label.setText(
