@@ -34,7 +34,9 @@ class PythonHighlighter(QtGui.QSyntaxHighlighter):
 
         self._rules: List[Tuple[QtCore.QRegularExpression, QtGui.QTextCharFormat]] = []
 
-        def add(pattern: str, colour: str, bold: bool = False, italic: bool = False) -> None:
+        def add(
+            pattern: str, colour: str, bold: bool = False, italic: bool = False
+        ) -> None:
             """
             Helper to add a highlighting rule.
 
@@ -125,7 +127,9 @@ class NodeTreeItem:
         parent (Optional[NodeTreeItem], optional): The parent item. Defaults to None.
     """
 
-    def __init__(self, node: Optional["hou.Node"], parent: Optional["NodeTreeItem"] = None) -> None:
+    def __init__(
+        self, node: Optional["hou.Node"], parent: Optional["NodeTreeItem"] = None
+    ) -> None:
         self.node: Optional["hou.Node"] = node
         self.parent_item: Optional["NodeTreeItem"] = parent
         self.children: List["NodeTreeItem"] = []
@@ -172,7 +176,9 @@ class NodeTreeModel(QtCore.QAbstractItemModel):
         parent (Optional[QtCore.QObject], optional): The parent object. Defaults to None.
     """
 
-    def __init__(self, root_path: str = "/", parent: Optional[QtCore.QObject] = None) -> None:
+    def __init__(
+        self, root_path: str = "/", parent: Optional[QtCore.QObject] = None
+    ) -> None:
         super().__init__(parent)
         self._root = NodeTreeItem(None)
         # Assuming hou is available if this class is used, or will handle None node gracefully
@@ -263,7 +269,9 @@ class NodeTreeModel(QtCore.QAbstractItemModel):
         """
         return 1
 
-    def data(self, index: QtCore.QModelIndex, role: int = Qt.ItemDataRole.DisplayRole) -> Any:
+    def data(
+        self, index: QtCore.QModelIndex, role: int = Qt.ItemDataRole.DisplayRole
+    ) -> Any:
         """
         Get data for the given index and role.
 
@@ -329,6 +337,7 @@ class CodeExplorerDialog(QtWidgets.QDialog):
         self._root_edit: Optional[QtWidgets.QLineEdit] = None
         self._refresh_btn: Optional[QtWidgets.QPushButton] = None
         self._copy_btn: Optional[QtWidgets.QPushButton] = None
+        self._font_btn: Optional[QtWidgets.QPushButton] = None
         self._tree_view: Optional[QtWidgets.QTreeView] = None
         self._search_edit: Optional[QtWidgets.QLineEdit] = None
         self._search_prev_btn: Optional[QtWidgets.QPushButton] = None
@@ -359,10 +368,13 @@ class CodeExplorerDialog(QtWidgets.QDialog):
         self._root_edit.setFixedWidth(200)
         self._refresh_btn = QtWidgets.QPushButton("Refresh Tree")
         self._copy_btn = QtWidgets.QPushButton("Copy Code")
+        self._font_btn = QtWidgets.QPushButton("Font...")
+        self._font_btn.setToolTip("Change the editor code font")
         toolbar.addWidget(QtWidgets.QLabel("Root:"))
         toolbar.addWidget(self._root_edit)
         toolbar.addWidget(self._refresh_btn)
         toolbar.addStretch()
+        toolbar.addWidget(self._font_btn)
         toolbar.addWidget(self._copy_btn)
         main_layout.addLayout(toolbar)
 
@@ -437,9 +449,15 @@ class CodeExplorerDialog(QtWidgets.QDialog):
 
         self._editor = QtWidgets.QPlainTextEdit()
         self._editor.setReadOnly(True)
-        font = QtGui.QFont("Courier New", 10)
-        font.setFixedPitch(True)
-        self._editor.setFont(font)
+        # Load saved font from QSettings, falling back to the default
+        _settings = QtCore.QSettings("NCCA", "CodeExplorer")
+        _saved_font = _settings.value("editor/font")
+        if isinstance(_saved_font, QtGui.QFont):
+            _editor_font = _saved_font
+        else:
+            _editor_font = QtGui.QFont("Courier New", 10)
+            _editor_font.setFixedPitch(True)
+        self._editor.setFont(_editor_font)
         # Dark background to match Houdini's script editor feel
         palette = self._editor.palette()
         palette.setColor(QPalette.ColorRole.Base, QtGui.QColor("#1E1E1E"))
@@ -470,6 +488,7 @@ class CodeExplorerDialog(QtWidgets.QDialog):
         self._tree_view.selectionModel().currentChanged.connect(self._on_node_selected)
         self._refresh_btn.clicked.connect(self._reload_tree)
         self._copy_btn.clicked.connect(self._copy_code)
+        self._font_btn.clicked.connect(self._choose_font)
         # Re-run asCode whenever any option checkbox changes
         for attr, _kwarg, _label, _default in self._ascode_opts:
             getattr(self, attr).stateChanged.connect(self._refresh_code)
@@ -503,7 +522,9 @@ class CodeExplorerDialog(QtWidgets.QDialog):
         self._tree_view.expandToDepth(1)
         self._status_label.setText(f"Tree loaded from {root_path}")
 
-    def _on_node_selected(self, current: QtCore.QModelIndex, previous: QtCore.QModelIndex) -> None:
+    def _on_node_selected(
+        self, current: QtCore.QModelIndex, previous: QtCore.QModelIndex
+    ) -> None:
         """
         Handle selection changes in the tree view.
 
@@ -548,9 +569,13 @@ class CodeExplorerDialog(QtWidgets.QDialog):
             kwargs = self._build_ascode_kwargs()
             code = node.asCode(**kwargs)
             self._editor.setPlainText(code)
-            self._status_label.setText(f"{node.path()}  [{node.type().name()}]  — {len(code.splitlines())} lines")
+            self._status_label.setText(
+                f"{node.path()}  [{node.type().name()}]  — {len(code.splitlines())} lines"
+            )
         except Exception as exc:
-            self._editor.setPlainText(f"# Error generating code for {node.path()}\n# {exc}")
+            self._editor.setPlainText(
+                f"# Error generating code for {node.path()}\n# {exc}"
+            )
             self._status_label.setText(f"Error: {exc}")
         # Re-apply any active search highlights after content changes
         self._on_search_changed()
@@ -613,7 +638,9 @@ class CodeExplorerDialog(QtWidgets.QDialog):
             self._search_count_label.setText("0 matches")
         else:
             self._search_edit.setStyleSheet("")
-            self._search_count_label.setText(f"{total} match{'es' if total != 1 else ''}")
+            self._search_count_label.setText(
+                f"{total} match{'es' if total != 1 else ''}"
+            )
 
     def _highlight_all(self, term: str) -> None:
         """
@@ -659,6 +686,18 @@ class CodeExplorerDialog(QtWidgets.QDialog):
             # Wrap around to bottom
             self._editor.moveCursor(QtGui.QTextCursor.MoveOperation.End)
             self._editor.find(term, flags)
+
+    def _choose_font(self) -> None:
+        """Open a font dialog and apply the chosen font to the editor, persisting it to QSettings."""
+        current_font = self._editor.font()
+        font, accepted = QtWidgets.QFontDialog.getFont(
+            current_font, self, "Choose Editor Font"
+        )
+        if accepted:
+            font.setFixedPitch(True)
+            self._editor.setFont(font)
+            settings = QtCore.QSettings("NCCA", "CodeExplorer")
+            settings.setValue("editor/font", font)
 
     def _copy_code(self) -> None:
         """Copy the current editor content to the system clipboard."""
