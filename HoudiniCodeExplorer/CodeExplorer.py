@@ -238,14 +238,42 @@ class CodeExplorerDialog(QtWidgets.QDialog):
         self._root_edit.setFixedWidth(200)
         self._refresh_btn = QtWidgets.QPushButton("Refresh Tree")
         self._copy_btn = QtWidgets.QPushButton("Copy Code")
-        self._verbose_cb = QtWidgets.QCheckBox("Verbose (full paths)")
         toolbar.addWidget(QtWidgets.QLabel("Root:"))
         toolbar.addWidget(self._root_edit)
         toolbar.addWidget(self._refresh_btn)
         toolbar.addStretch()
-        toolbar.addWidget(self._verbose_cb)
         toolbar.addWidget(self._copy_btn)
         main_layout.addLayout(toolbar)
+
+        # asCode options row
+        # Each tuple: (attr_name, kwarg_name, label, default)
+        # 'brief' is the inverse of verbose so handled separately.
+        self._ascode_opts = [
+            ("_cb_brief", "brief", "Brief", False),
+            ("_cb_recurse", "recurse", "Recurse", False),
+            ("_cb_channels_only", "save_channels_only", "Channels only", False),
+            ("_cb_creation_cmds", "save_creation_commands", "Creation commands", True),
+            ("_cb_keys_in_frames", "save_keys_in_frames", "Keys in frames", False),
+            ("_cb_outgoing_wires", "save_outgoing_wires", "Outgoing wires", False),
+            (
+                "_cb_parm_values_only",
+                "save_parm_values_only",
+                "Parm values only",
+                False,
+            ),
+            ("_cb_spare_parms", "save_spare_parms", "Spare parms", True),
+            ("_cb_box_membership", "save_box_membership", "Box membership", True),
+        ]
+        opts_layout = QtWidgets.QHBoxLayout()
+        opts_layout.setSpacing(10)
+        opts_layout.addWidget(QtWidgets.QLabel("asCode:"))
+        for attr, _kwarg, label, default in self._ascode_opts:
+            cb = QtWidgets.QCheckBox(label)
+            cb.setChecked(default)
+            setattr(self, attr, cb)
+            opts_layout.addWidget(cb)
+        opts_layout.addStretch()
+        main_layout.addLayout(opts_layout)
 
         # Splitter: tree on left, editor on right
         splitter = QtWidgets.QSplitter(Qt.Orientation.Horizontal)
@@ -297,6 +325,9 @@ class CodeExplorerDialog(QtWidgets.QDialog):
         self._tree_view.selectionModel().currentChanged.connect(self._on_node_selected)
         self._refresh_btn.clicked.connect(self._reload_tree)
         self._copy_btn.clicked.connect(self._copy_code)
+        # Re-run asCode whenever any option checkbox changes
+        for attr, _kwarg, _label, _default in self._ascode_opts:
+            getattr(self, attr).stateChanged.connect(self._refresh_code)
 
     # ------------------------------------------------------------------
     # Slots
@@ -321,22 +352,26 @@ class CodeExplorerDialog(QtWidgets.QDialog):
         node = current.data(Qt.ItemDataRole.UserRole)
         if node is None:
             return
+        self._current_node = node
         self._show_node_code(node)
+
+    def _refresh_code(self):
+        """Re-run asCode on the current node when any option checkbox changes."""
+        node = getattr(self, "_current_node", None)
+        if node is not None:
+            self._show_node_code(node)
+
+    def _build_ascode_kwargs(self):
+        """Return a dict of kwargs for node.asCode() from the current checkbox state."""
+        kwargs = {}
+        for attr, kwarg, _label, _default in self._ascode_opts:
+            kwargs[kwarg] = getattr(self, attr).isChecked()
+        return kwargs
 
     def _show_node_code(self, node):
         try:
-            verbose = self._verbose_cb.isChecked()
-            code = node.asCode(
-                brief=not verbose,
-                recurse=False,
-                save_channels_only=False,
-                save_creation_commands=True,
-                save_keys_in_frames=False,
-                save_outgoing_wires=False,
-                save_parm_values_only=False,
-                save_spare_parms=True,
-                save_box_membership=True,
-            )
+            kwargs = self._build_ascode_kwargs()
+            code = node.asCode(**kwargs)
             self._editor.setPlainText(code)
             self._status_label.setText(
                 f"{node.path()}  [{node.type().name()}]  "
