@@ -458,6 +458,7 @@ class CodeExplorerDialog(QtWidgets.QDialog):
             _editor_font = QtGui.QFont("Courier New", 10)
             _editor_font.setFixedPitch(True)
         self._editor.setFont(_editor_font)
+        self._editor.document().setDefaultFont(_editor_font)
         # Dark background to match Houdini's script editor feel
         palette = self._editor.palette()
         palette.setColor(QPalette.ColorRole.Base, QtGui.QColor("#1E1E1E"))
@@ -695,6 +696,11 @@ class CodeExplorerDialog(QtWidgets.QDialog):
         )
         if accepted:
             self._editor.setFont(font)
+            # The syntax highlighter's QTextCharFormat blocks override the
+            # widget font, so we must also update the document's default font
+            # and rehighlight to make the new size/family visible everywhere.
+            self._editor.document().setDefaultFont(font)
+            self._highlighter.rehighlight()
             settings = QtCore.QSettings("NCCA", "CodeExplorer")
             settings.setValue("editor/font", font)
 
