@@ -694,7 +694,6 @@ class CodeExplorerDialog(QtWidgets.QDialog):
             current_font, self, "Choose Editor Font"
         )
         if accepted:
-            font.setFixedPitch(True)
             self._editor.setFont(font)
             settings = QtCore.QSettings("NCCA", "CodeExplorer")
             settings.setValue("editor/font", font)
