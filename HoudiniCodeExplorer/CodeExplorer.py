@@ -285,11 +285,34 @@ class CodeExplorerDialog(QtWidgets.QDialog):
         self._tree_view.setAlternatingRowColors(True)
         splitter.addWidget(self._tree_view)
 
-        # Right: code editor + status bar
+        # Right: search bar + code editor + status bar
         right_widget = QtWidgets.QWidget()
         right_layout = QtWidgets.QVBoxLayout(right_widget)
         right_layout.setContentsMargins(0, 0, 0, 0)
         right_layout.setSpacing(2)
+
+        # Search bar
+        search_layout = QtWidgets.QHBoxLayout()
+        search_layout.setSpacing(4)
+        self._search_edit = QtWidgets.QLineEdit()
+        self._search_edit.setPlaceholderText("Search code...  (Enter / Shift+Enter)")
+        self._search_prev_btn = QtWidgets.QPushButton("▲")
+        self._search_prev_btn.setFixedWidth(28)
+        self._search_prev_btn.setToolTip("Previous match")
+        self._search_next_btn = QtWidgets.QPushButton("▼")
+        self._search_next_btn.setFixedWidth(28)
+        self._search_next_btn.setToolTip("Next match")
+        self._search_case_cb = QtWidgets.QCheckBox("Aa")
+        self._search_case_cb.setToolTip("Case sensitive")
+        self._search_count_label = QtWidgets.QLabel("")
+        self._search_count_label.setStyleSheet("color: #888; min-width: 80px;")
+        search_layout.addWidget(QtWidgets.QLabel("Find:"))
+        search_layout.addWidget(self._search_edit, 1)
+        search_layout.addWidget(self._search_prev_btn)
+        search_layout.addWidget(self._search_next_btn)
+        search_layout.addWidget(self._search_case_cb)
+        search_layout.addWidget(self._search_count_label)
+        right_layout.addLayout(search_layout)
 
         self._editor = QtWidgets.QPlainTextEdit()
         self._editor.setReadOnly(True)
@@ -328,6 +351,13 @@ class CodeExplorerDialog(QtWidgets.QDialog):
         # Re-run asCode whenever any option checkbox changes
         for attr, _kwarg, _label, _default in self._ascode_opts:
             getattr(self, attr).stateChanged.connect(self._refresh_code)
+        # Search
+        self._search_edit.textChanged.connect(self._on_search_changed)
+        self._search_edit.returnPressed.connect(self._search_next)
+        self._search_edit.installEventFilter(self)
+        self._search_next_btn.clicked.connect(self._search_next)
+        self._search_prev_btn.clicked.connect(self._search_prev)
+        self._search_case_cb.stateChanged.connect(self._on_search_changed)
 
     # ------------------------------------------------------------------
     # Slots
@@ -382,12 +412,110 @@ class CodeExplorerDialog(QtWidgets.QDialog):
                 f"# Error generating code for {node.path()}\n# {exc}"
             )
             self._status_label.setText(f"Error: {exc}")
+        # Re-apply any active search highlights after content changes
+        self._on_search_changed()
+
+    # ------------------------------------------------------------------
+    # Search
+    # ------------------------------------------------------------------
+
+    def _search_flags(self):
+        flags = QtGui.QTextDocument.FindFlag(0)
+        if self._search_case_cb.isChecked():
+            flags |= QtGui.QTextDocument.FindFlag.FindCaseSensitively
+        return flags
+
+    def _count_matches(self, term):
+        """Return the total number of occurrences of term in the document."""
+        if not term:
+            return 0
+        doc = self._editor.document()
+        flags = self._search_flags()
+        # Count from document start
+        cursor = doc.find(term, 0, flags)
+        count = 0
+        while not cursor.isNull():
+            count += 1
+            cursor = doc.find(term, cursor, flags)
+        return count
+
+    def _on_search_changed(self):
+        term = self._search_edit.text()
+        if not term:
+            # Clear any extra selections and reset field colour
+            self._editor.setExtraSelections([])
+            self._search_count_label.setText("")
+            self._search_edit.setStyleSheet("")
+            return
+        # Highlight all matches with a background colour
+        self._highlight_all(term)
+        # Jump to first match from the top
+        self._editor.moveCursor(QtGui.QTextCursor.MoveOperation.Start)
+        found = self._editor.find(term, self._search_flags())
+        total = self._count_matches(term)
+        if not found and total == 0:
+            self._search_edit.setStyleSheet("background-color: #5a1a1a;")
+            self._search_count_label.setText("0 matches")
+        else:
+            self._search_edit.setStyleSheet("")
+            self._search_count_label.setText(
+                f"{total} match{'es' if total != 1 else ''}"
+            )
+
+    def _highlight_all(self, term):
+        """Paint a dim background on every occurrence in the document."""
+        selections = []
+        if term:
+            doc = self._editor.document()
+            flags = self._search_flags()
+            cursor = doc.find(term, 0, flags)
+            fmt = QtGui.QTextCharFormat()
+            fmt.setBackground(QtGui.QColor("#3a3a00"))
+            while not cursor.isNull():
+                sel = QtWidgets.QTextEdit.ExtraSelection()
+                sel.cursor = cursor
+                sel.format = fmt
+                selections.append(sel)
+                cursor = doc.find(term, cursor, flags)
+        self._editor.setExtraSelections(selections)
+
+    def _search_next(self):
+        term = self._search_edit.text()
+        if not term:
+            return
+        found = self._editor.find(term, self._search_flags())
+        if not found:
+            # Wrap around to top
+            self._editor.moveCursor(QtGui.QTextCursor.MoveOperation.Start)
+            self._editor.find(term, self._search_flags())
+
+    def _search_prev(self):
+        term = self._search_edit.text()
+        if not term:
+            return
+        flags = self._search_flags() | QtGui.QTextDocument.FindFlag.FindBackward
+        found = self._editor.find(term, flags)
+        if not found:
+            # Wrap around to bottom
+            self._editor.moveCursor(QtGui.QTextCursor.MoveOperation.End)
+            self._editor.find(term, flags)
 
     def _copy_code(self):
         text = self._editor.toPlainText()
         if text:
             QtWidgets.QApplication.clipboard().setText(text)
             self._status_label.setText("Code copied to clipboard.")
+
+    def eventFilter(self, obj, event):
+        """Intercept Shift+Enter in the search field to go backwards."""
+        if obj is self._search_edit and event.type() == QtCore.QEvent.Type.KeyPress:
+            if (
+                event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter)
+                and event.modifiers() & Qt.KeyboardModifier.ShiftModifier
+            ):
+                self._search_prev()
+                return True
+        return super().eventFilter(obj, event)
 
     def closeEvent(self, event):
         super().closeEvent(event)
