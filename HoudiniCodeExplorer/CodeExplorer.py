@@ -1,3 +1,8 @@
+"""
+This is 100% vibe coded from a basic demo I wrote a long time ago. See the file CodeExplorerSession.md in the github repo 
+"""
+
+
 try:
     import hou
 except ImportError:
