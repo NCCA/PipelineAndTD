@@ -1,0 +1,375 @@
+try:
+    import hou
+except ImportError:
+    hou = None  # Allow linting outside Houdini
+
+from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPalette
+
+
+# ---------------------------------------------------------------------------
+# Syntax highlighter for Python code
+# ---------------------------------------------------------------------------
+
+
+class PythonHighlighter(QtGui.QSyntaxHighlighter):
+    """Minimal Python syntax highlighter using Houdini-friendly dark colours."""
+
+    def __init__(self, document):
+        super().__init__(document)
+
+        self._rules = []
+
+        def add(pattern, colour, bold=False, italic=False):
+            fmt = QtGui.QTextCharFormat()
+            fmt.setForeground(QtGui.QColor(colour))
+            if bold:
+                fmt.setFontWeight(QtGui.QFont.Weight.Bold)
+            if italic:
+                fmt.setFontItalic(True)
+            self._rules.append((QtCore.QRegularExpression(pattern), fmt))
+
+        # Keywords
+        keywords = [
+            "False",
+            "None",
+            "True",
+            "and",
+            "as",
+            "assert",
+            "async",
+            "await",
+            "break",
+            "class",
+            "continue",
+            "def",
+            "del",
+            "elif",
+            "else",
+            "except",
+            "finally",
+            "for",
+            "from",
+            "global",
+            "if",
+            "import",
+            "in",
+            "is",
+            "lambda",
+            "nonlocal",
+            "not",
+            "or",
+            "pass",
+            "raise",
+            "return",
+            "try",
+            "while",
+            "with",
+            "yield",
+        ]
+        kw_pattern = r"\b(" + "|".join(keywords) + r")\b"
+        add(kw_pattern, "#569CD6", bold=True)
+
+        # Built-ins
+        builtins = [
+            "print",
+            "len",
+            "range",
+            "int",
+            "float",
+            "str",
+            "list",
+            "dict",
+            "tuple",
+            "set",
+            "bool",
+            "type",
+            "isinstance",
+            "hasattr",
+            "getattr",
+            "setattr",
+            "enumerate",
+            "zip",
+            "map",
+            "filter",
+            "sorted",
+            "reversed",
+            "open",
+            "super",
+            "self",
+        ]
+        add(r"\b(" + "|".join(builtins) + r")\b", "#DCDCAA")
+
+        # Decorators
+        add(r"@\w+", "#C586C0")
+
+        # Numbers
+        add(r"\b[0-9]+\.?[0-9]*([eE][+-]?[0-9]+)?\b", "#B5CEA8")
+
+        # Double-quoted strings
+        add(r'"[^"\\]*(\\.[^"\\]*)*"', "#CE9178")
+        # Single-quoted strings
+        add(r"'[^'\\]*(\\.[^'\\]*)*'", "#CE9178")
+
+        # Triple-quoted strings (simple, single-line match only)
+        add(r'""".*?"""', "#CE9178")
+        add(r"'''.*?'''", "#CE9178")
+
+        # Comments
+        add(r"#[^\n]*", "#6A9955", italic=True)
+
+        # hou module references
+        add(r"\bhou\b", "#4EC9B0", bold=True)
+
+    def highlightBlock(self, text):
+        for pattern, fmt in self._rules:
+            it = pattern.globalMatch(text)
+            while it.hasNext():
+                m = it.next()
+                self.setFormat(m.capturedStart(), m.capturedLength(), fmt)
+
+
+# ---------------------------------------------------------------------------
+# Node tree model
+# ---------------------------------------------------------------------------
+
+
+class NodeTreeItem:
+    def __init__(self, node, parent=None):
+        self.node = node
+        self.parent_item = parent
+        self.children = []
+
+    def child(self, row):
+        return self.children[row]
+
+    def child_count(self):
+        return len(self.children)
+
+    def row(self):
+        if self.parent_item:
+            return self.parent_item.children.index(self)
+        return 0
+
+
+class NodeTreeModel(QtCore.QAbstractItemModel):
+    def __init__(self, root_path="/", parent=None):
+        super().__init__(parent)
+        self._root = NodeTreeItem(None)
+        self._populate(self._root, hou.node(root_path))
+
+    def _populate(self, parent_item, node):
+        if node is None:
+            return
+        item = NodeTreeItem(node, parent_item)
+        parent_item.children.append(item)
+        for child in node.children():
+            self._populate(item, child)
+
+    def index(self, row, column, parent=QtCore.QModelIndex()):
+        if not self.hasIndex(row, column, parent):
+            return QtCore.QModelIndex()
+        parent_item = parent.internalPointer() if parent.isValid() else self._root
+        child = parent_item.child(row)
+        if child:
+            return self.createIndex(row, column, child)
+        return QtCore.QModelIndex()
+
+    def parent(self, index):
+        if not index.isValid():
+            return QtCore.QModelIndex()
+        item = index.internalPointer()
+        p = item.parent_item
+        if p is self._root or p is None:
+            return QtCore.QModelIndex()
+        return self.createIndex(p.row(), 0, p)
+
+    def rowCount(self, parent=QtCore.QModelIndex()):
+        p = parent.internalPointer() if parent.isValid() else self._root
+        return p.child_count()
+
+    def columnCount(self, parent=QtCore.QModelIndex()):
+        return 1
+
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
+        if not index.isValid():
+            return None
+        item = index.internalPointer()
+        if role == Qt.ItemDataRole.DisplayRole:
+            node = item.node
+            return f"{node.name()}  [{node.type().name()}]"
+        if role == Qt.ItemDataRole.UserRole:
+            return item.node
+        return None
+
+    def flags(self, index):
+        if not index.isValid():
+            return Qt.ItemFlag.NoItemFlags
+        return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
+
+
+# ---------------------------------------------------------------------------
+# Main dialog
+# ---------------------------------------------------------------------------
+
+
+class CodeExplorerDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Code Explorer")
+        self.resize(1100, 700)
+        self._build_ui()
+        self._connect_signals()
+
+    # ------------------------------------------------------------------
+    # UI construction
+    # ------------------------------------------------------------------
+
+    def _build_ui(self):
+        main_layout = QtWidgets.QVBoxLayout(self)
+        main_layout.setContentsMargins(6, 6, 6, 6)
+        main_layout.setSpacing(4)
+
+        # Toolbar row
+        toolbar = QtWidgets.QHBoxLayout()
+        self._root_edit = QtWidgets.QLineEdit("/")
+        self._root_edit.setPlaceholderText("Root node path (e.g. /obj)")
+        self._root_edit.setFixedWidth(200)
+        self._refresh_btn = QtWidgets.QPushButton("Refresh Tree")
+        self._copy_btn = QtWidgets.QPushButton("Copy Code")
+        self._verbose_cb = QtWidgets.QCheckBox("Verbose (full paths)")
+        toolbar.addWidget(QtWidgets.QLabel("Root:"))
+        toolbar.addWidget(self._root_edit)
+        toolbar.addWidget(self._refresh_btn)
+        toolbar.addStretch()
+        toolbar.addWidget(self._verbose_cb)
+        toolbar.addWidget(self._copy_btn)
+        main_layout.addLayout(toolbar)
+
+        # Splitter: tree on left, editor on right
+        splitter = QtWidgets.QSplitter(Qt.Orientation.Horizontal)
+
+        # Left: node tree
+        self._tree_view = QtWidgets.QTreeView()
+        self._tree_view.setHeaderHidden(True)
+        self._tree_view.setMinimumWidth(260)
+        self._tree_view.setAlternatingRowColors(True)
+        splitter.addWidget(self._tree_view)
+
+        # Right: code editor + status bar
+        right_widget = QtWidgets.QWidget()
+        right_layout = QtWidgets.QVBoxLayout(right_widget)
+        right_layout.setContentsMargins(0, 0, 0, 0)
+        right_layout.setSpacing(2)
+
+        self._editor = QtWidgets.QPlainTextEdit()
+        self._editor.setReadOnly(True)
+        font = QtGui.QFont("Courier New", 10)
+        font.setFixedPitch(True)
+        self._editor.setFont(font)
+        # Dark background to match Houdini's script editor feel
+        palette = self._editor.palette()
+        palette.setColor(QPalette.ColorRole.Base, QtGui.QColor("#1E1E1E"))
+        palette.setColor(QPalette.ColorRole.Text, QtGui.QColor("#D4D4D4"))
+        self._editor.setPalette(palette)
+        self._highlighter = PythonHighlighter(self._editor.document())
+
+        self._status_label = QtWidgets.QLabel("")
+        self._status_label.setStyleSheet("color: #888; font-size: 11px;")
+
+        right_layout.addWidget(self._editor)
+        right_layout.addWidget(self._status_label)
+        splitter.addWidget(right_widget)
+
+        splitter.setStretchFactor(0, 1)
+        splitter.setStretchFactor(1, 3)
+        main_layout.addWidget(splitter)
+
+        # Populate tree with default root
+        self._reload_tree()
+
+    # ------------------------------------------------------------------
+    # Signal wiring
+    # ------------------------------------------------------------------
+
+    def _connect_signals(self):
+        self._tree_view.selectionModel().currentChanged.connect(self._on_node_selected)
+        self._refresh_btn.clicked.connect(self._reload_tree)
+        self._copy_btn.clicked.connect(self._copy_code)
+
+    # ------------------------------------------------------------------
+    # Slots
+    # ------------------------------------------------------------------
+
+    def _reload_tree(self):
+        root_path = self._root_edit.text().strip() or "/"
+        node = hou.node(root_path)
+        if node is None:
+            self._status_label.setText(f"Node not found: {root_path}")
+            return
+        model = NodeTreeModel(root_path)
+        self._tree_view.setModel(model)
+        # Re-wire selection after model replacement
+        self._tree_view.selectionModel().currentChanged.connect(self._on_node_selected)
+        self._tree_view.expandToDepth(1)
+        self._status_label.setText(f"Tree loaded from {root_path}")
+
+    def _on_node_selected(self, current, previous):
+        if not current.isValid():
+            return
+        node = current.data(Qt.ItemDataRole.UserRole)
+        if node is None:
+            return
+        self._show_node_code(node)
+
+    def _show_node_code(self, node):
+        try:
+            verbose = self._verbose_cb.isChecked()
+            code = node.asCode(
+                brief=not verbose,
+                recurse=False,
+                save_box_contents=False,
+                save_channels_only=False,
+                save_creation_commands=True,
+                save_flags=True,
+                save_extra_flags=False,
+            )
+            self._editor.setPlainText(code)
+            self._status_label.setText(
+                f"{node.path()}  [{node.type().name()}]  "
+                f"— {len(code.splitlines())} lines"
+            )
+        except Exception as exc:
+            self._editor.setPlainText(
+                f"# Error generating code for {node.path()}\n# {exc}"
+            )
+            self._status_label.setText(f"Error: {exc}")
+
+    def _copy_code(self):
+        text = self._editor.toPlainText()
+        if text:
+            QtWidgets.QApplication.clipboard().setText(text)
+            self._status_label.setText("Code copied to clipboard.")
+
+    def closeEvent(self, event):
+        super().closeEvent(event)
+
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+
+
+def show():
+    """Create and show the Code Explorer dialog, parented to Houdini's main window."""
+    dialog = CodeExplorerDialog()
+    dialog.setParent(hou.qt.mainWindow(), Qt.WindowType.Window)
+    dialog.show()
+    return dialog
+
+
+# Allow running directly from the Houdini Python Shell or Script Editor:
+#   exec(open('/path/to/CodeExplorer.py').read())
+if __name__ == "__main__" or "hou" in dir():
+    show()
