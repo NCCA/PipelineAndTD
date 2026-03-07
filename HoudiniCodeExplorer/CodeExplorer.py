@@ -347,9 +347,24 @@ class CodeExplorerDialog(QtWidgets.QDialog):
         self._editor: Optional[QtWidgets.QPlainTextEdit] = None
         self._highlighter: Optional[PythonHighlighter] = None
         self._status_label: Optional[QtWidgets.QLabel] = None
+        self._font = None
+        self._load_settings()
 
         self._build_ui()
         self._connect_signals()
+
+    def _load_settings(self) -> None:
+        """Load font settings from QSettings."""
+        self._settings = QtCore.QSettings("NCCA", "CodeExplorer")
+        self._settings.beginGroup("Font")
+        name = self._settings.value("font-name", type=str, defaultValue="Courier New")
+        size = self._settings.value("font-size", type=int, defaultValue=18)
+        weight = self._settings.value("font-weight", type=int, defaultValue=50)
+        italic = self._settings.value("font-italic", type=bool, defaultValue=False)
+        self._settings.endGroup()
+        self._font = QtGui.QFont(name, size)
+        self._font.setWeight(QtGui.QFont.Weight(weight))
+        self._font.setItalic(italic)
 
     # ------------------------------------------------------------------
     # UI construction
@@ -450,15 +465,14 @@ class CodeExplorerDialog(QtWidgets.QDialog):
         self._editor = QtWidgets.QPlainTextEdit()
         self._editor.setReadOnly(True)
         # Load saved font from QSettings, falling back to the default
-        _settings = QtCore.QSettings("NCCA", "CodeExplorer")
-        _saved_font = _settings.value("editor/font")
-        if isinstance(_saved_font, QtGui.QFont):
-            _editor_font = _saved_font
-        else:
-            _editor_font = QtGui.QFont("Courier New", 10)
-            _editor_font.setFixedPitch(True)
-        self._editor.setFont(_editor_font)
-        self._editor.document().setDefaultFont(_editor_font)
+        # _saved_font = self._settings.value("editor/font")
+        # if isinstance(_saved_font, QtGui.QFont):
+        #     _editor_font = _saved_font
+        # else:
+        #     _editor_font = QtGui.QFont("Courier New", 10)
+        #     _editor_font.setFixedPitch(True)
+        self._editor.setFont(self._font)
+        self._editor.document().setDefaultFont(self._font)
         # Dark background to match Houdini's script editor feel
         palette = self._editor.palette()
         palette.setColor(QPalette.ColorRole.Base, QtGui.QColor("#1E1E1E"))
@@ -692,17 +706,24 @@ class CodeExplorerDialog(QtWidgets.QDialog):
         """Open a font dialog and apply the chosen font to the editor, persisting it to QSettings."""
         current_font = self._editor.font()
         font, accepted = QtWidgets.QFontDialog.getFont(
-            current_font, self, "Choose Editor Font"
+            self, "Choose Editor Font", current_font
         )
-        if accepted:
-            self._editor.setFont(font)
-            # The syntax highlighter's QTextCharFormat blocks override the
-            # widget font, so we must also update the document's default font
-            # and rehighlight to make the new size/family visible everywhere.
-            self._editor.document().setDefaultFont(font)
-            self._highlighter.rehighlight()
-            settings = QtCore.QSettings("NCCA", "CodeExplorer")
-            settings.setValue("editor/font", font)
+        if not accepted:
+            return
+        self._editor.setFont(font)
+        # The syntax highlighter's QTextCharFormat blocks override the
+        # widget font, so we must also update the document's default font
+        # and rehighlight to make the new size/family visible everywhere.
+        self._editor.document().setDefaultFont(font)
+        self._highlighter.rehighlight()
+        self._settings = QtCore.QSettings("NCCA", "CodeExplorer")
+        self._settings.beginGroup("Font")
+        self._settings.setValue("font-name", font.family())
+        self._settings.setValue("font-size", font.pointSize())
+        self._settings.setValue("font-weight", int(font.weight().value))
+        self._settings.setValue("font-italic", font.italic())
+        self._settings.endGroup()
+        self._settings.sync()
 
     def _copy_code(self) -> None:
         """Copy the current editor content to the system clipboard."""
