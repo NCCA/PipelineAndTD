@@ -1,10 +1,6 @@
-from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QPalette
+from typing import List, Tuple
 
-# ---------------------------------------------------------------------------
-# Syntax highlighter for Python code
-# ---------------------------------------------------------------------------
+from PySide6 import QtCore, QtGui
 
 
 class PythonHighlighter(QtGui.QSyntaxHighlighter):

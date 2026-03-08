@@ -4,8 +4,7 @@ See the file CodeExplorerSession.md in the github repo here:
 https://github.com/NCCA/PipelineAndTD/blob/main/HoudiniCodeExplorer/CodeExplorerSession.md
 """
 
-import sys
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple
 
 try:
     import hou
@@ -15,7 +14,7 @@ from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPalette
 
-from NodeTree import NodeTreeItem, NodeTreeModel
+from NodeTree import NodeTreeModel
 from PythonHighlighter import PythonHighlighter
 
 # ---------------------------------------------------------------------------
@@ -250,7 +249,9 @@ class CodeExplorerDialog(QtWidgets.QDialog):
         self._tree_view.expandToDepth(1)
         self._status_label.setText(f"Tree loaded from {root_path}")
 
-    def _on_node_selected(self, current: QtCore.QModelIndex, previous: QtCore.QModelIndex) -> None:
+    def _on_node_selected(
+        self, current: QtCore.QModelIndex, previous: QtCore.QModelIndex
+    ) -> None:
         """
         Handle selection changes in the tree view.
 
@@ -295,9 +296,13 @@ class CodeExplorerDialog(QtWidgets.QDialog):
             kwargs = self._build_ascode_kwargs()
             code = node.asCode(**kwargs)
             self._editor.setPlainText(code)
-            self._status_label.setText(f"{node.path()}  [{node.type().name()}]  — {len(code.splitlines())} lines")
+            self._status_label.setText(
+                f"{node.path()}  [{node.type().name()}]  — {len(code.splitlines())} lines"
+            )
         except Exception as exc:
-            self._editor.setPlainText(f"# Error generating code for {node.path()}\n# {exc}")
+            self._editor.setPlainText(
+                f"# Error generating code for {node.path()}\n# {exc}"
+            )
             self._status_label.setText(f"Error: {exc}")
         # Re-apply any active search highlights after content changes
         self._on_search_changed()
@@ -360,7 +365,9 @@ class CodeExplorerDialog(QtWidgets.QDialog):
             self._search_count_label.setText("0 matches")
         else:
             self._search_edit.setStyleSheet("")
-            self._search_count_label.setText(f"{total} match{'es' if total != 1 else ''}")
+            self._search_count_label.setText(
+                f"{total} match{'es' if total != 1 else ''}"
+            )
 
     def _highlight_all(self, term: str) -> None:
         """
@@ -410,7 +417,9 @@ class CodeExplorerDialog(QtWidgets.QDialog):
     def _choose_font(self) -> None:
         """Open a font dialog and apply the chosen font to the editor, persisting it to QSettings."""
         current_font = self._editor.font()
-        font, accepted = QtWidgets.QFontDialog.getFont(self, "Choose Editor Font", current_font)
+        font, accepted = QtWidgets.QFontDialog.getFont(
+            self, "Choose Editor Font", current_font
+        )
         if not accepted:
             return
         self._editor.setFont(font)

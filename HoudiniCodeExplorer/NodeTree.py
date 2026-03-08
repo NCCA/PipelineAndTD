@@ -1,17 +1,12 @@
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, List, Optional
 
-from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6 import QtCore
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPalette
 
 try:
     import hou
 except ImportError:
     hou = None  # Allow linting outside Houdini
-
-# ---------------------------------------------------------------------------
-# Node tree model
-# ---------------------------------------------------------------------------
 
 
 class NodeTreeItem:
@@ -93,12 +88,7 @@ class NodeTreeModel(QtCore.QAbstractItemModel):
         for child in node.children():
             self._populate(item, child)
 
-    def index(
-        self,
-        row: int,
-        column: int,
-        parent: QtCore.QModelIndex = QtCore.QModelIndex(),
-    ) -> QtCore.QModelIndex:
+    def index(self, row: int, column: int, parent: QtCore.QModelIndex = QtCore.QModelIndex()) -> QtCore.QModelIndex:
         """
         Get the model index for the given row, column, and parent index.
 

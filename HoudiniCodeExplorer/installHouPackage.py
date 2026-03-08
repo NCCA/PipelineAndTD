@@ -45,7 +45,7 @@ def install_package(m_loc, current_dir):
 def check_houdini_installed(op_sys):
     houdini_location = Path(f"{Path.home()}{houdini_locations.get(op_sys)}")
     if not houdini_location.is_dir():
-        raise
+        raise FileNotFoundError(f"Houdini not found at {houdini_location}")
     return houdini_location
 
 
@@ -55,8 +55,8 @@ if __name__ == "__main__":
         houdini_location = check_houdini_installed(op_sys)
         current_dir = Path.cwd()
 
-    except:
-        print("Error can't find houdini install")
+    except FileNotFoundError as e:
+        print(f"Error can't find houdini install: {e}")
         sys.exit(-1)
 
     install_package(houdini_location, current_dir)
