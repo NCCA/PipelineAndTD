@@ -14,6 +14,7 @@ from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPalette
 
+from HouTextEditor import HoudiniTextEditor
 from NodeTree import NodeTreeModel
 from PythonHighlighter import PythonHighlighter
 
@@ -173,16 +174,9 @@ class CodeExplorerDialog(QtWidgets.QDialog):
         search_layout.addWidget(self._search_count_label)
         right_layout.addLayout(search_layout)
 
-        self._editor = QtWidgets.QPlainTextEdit()
+        self._editor = HoudiniTextEditor()  # QtWidgets.QPlainTextEdit()
         self._editor.setReadOnly(True)
-        # Load saved font from QSettings, falling back to the default
-        # _saved_font = self._settings.value("editor/font")
-        # if isinstance(_saved_font, QtGui.QFont):
-        #     _editor_font = _saved_font
-        # else:
-        #     _editor_font = QtGui.QFont("Courier New", 10)
-        #     _editor_font.setFixedPitch(True)
-        self._editor.setFont(self._font)
+        self._editor.set_font(self._font)
         self._editor.document().setDefaultFont(self._font)
         # Dark background to match Houdini's script editor feel
         palette = self._editor.palette()
@@ -249,9 +243,7 @@ class CodeExplorerDialog(QtWidgets.QDialog):
         self._tree_view.expandToDepth(1)
         self._status_label.setText(f"Tree loaded from {root_path}")
 
-    def _on_node_selected(
-        self, current: QtCore.QModelIndex, previous: QtCore.QModelIndex
-    ) -> None:
+    def _on_node_selected(self, current: QtCore.QModelIndex, previous: QtCore.QModelIndex) -> None:
         """
         Handle selection changes in the tree view.
 
@@ -296,13 +288,9 @@ class CodeExplorerDialog(QtWidgets.QDialog):
             kwargs = self._build_ascode_kwargs()
             code = node.asCode(**kwargs)
             self._editor.setPlainText(code)
-            self._status_label.setText(
-                f"{node.path()}  [{node.type().name()}]  — {len(code.splitlines())} lines"
-            )
+            self._status_label.setText(f"{node.path()}  [{node.type().name()}]  — {len(code.splitlines())} lines")
         except Exception as exc:
-            self._editor.setPlainText(
-                f"# Error generating code for {node.path()}\n# {exc}"
-            )
+            self._editor.setPlainText(f"# Error generating code for {node.path()}\n# {exc}")
             self._status_label.setText(f"Error: {exc}")
         # Re-apply any active search highlights after content changes
         self._on_search_changed()
@@ -365,9 +353,7 @@ class CodeExplorerDialog(QtWidgets.QDialog):
             self._search_count_label.setText("0 matches")
         else:
             self._search_edit.setStyleSheet("")
-            self._search_count_label.setText(
-                f"{total} match{'es' if total != 1 else ''}"
-            )
+            self._search_count_label.setText(f"{total} match{'es' if total != 1 else ''}")
 
     def _highlight_all(self, term: str) -> None:
         """
@@ -417,12 +403,10 @@ class CodeExplorerDialog(QtWidgets.QDialog):
     def _choose_font(self) -> None:
         """Open a font dialog and apply the chosen font to the editor, persisting it to QSettings."""
         current_font = self._editor.font()
-        font, accepted = QtWidgets.QFontDialog.getFont(
-            self, "Choose Editor Font", current_font
-        )
+        font, accepted = QtWidgets.QFontDialog.getFont(self, "Choose Editor Font", current_font)
         if not accepted:
             return
-        self._editor.setFont(font)
+        self._editor.set_font(font)
         # The syntax highlighter's QTextCharFormat blocks override the
         # widget font, so we must also update the document's default font
         # and rehighlight to make the new size/family visible everywhere.
