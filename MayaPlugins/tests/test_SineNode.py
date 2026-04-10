@@ -6,31 +6,36 @@ import maya.standalone
 import pytest
 import SineNode
 
-node_name = "TestSineNode"
+NODE_NAME = "TestSineNode"
+PLUGIN_NAME = "SineNode.py"
+NODE_TYPE = "SineNodePy"
 
 
 @pytest.fixture(scope="module")
-def setup_module(maya_standalone):
-    cmds.loadPlugin("SineNode.py")
-    cmds.createNode("SineNodePy", name=node_name)
+def load_plugin(maya_standalone):
+    cmds.loadPlugin(PLUGIN_NAME)
+    cmds.createNode(NODE_TYPE, name=NODE_NAME)
+    yield
+    # new file to clear all nodes
+    cmds.file(new=True, force=True)
+    cmds.unloadPlugin(PLUGIN_NAME)
 
 
-def test_SineNode(setup_module):
-    # Create a sphere
+def test_SineNodeCreated(load_plugin):
     import maya.cmds as cmds
 
-    results = cmds.ls(node_name)
+    results = cmds.ls(NODE_NAME)
     assert len(results) == 1
 
 
-def test_setAttrib(setup_module):
+def test_setAttrib(load_plugin):
     import maya.cmds as cmds
 
     # Set the amplitude attribute
-    cmds.setAttr(f"{node_name}.amplitude", 2.0)
-    results = cmds.getAttr(f"{node_name}.amplitude")
+    cmds.setAttr(f"{NODE_NAME}.amplitude", 2.0)
+    results = cmds.getAttr(f"{NODE_NAME}.amplitude")
     assert results == pytest.approx(2.0)
 
-    cmds.setAttr(f"{node_name}.frequency", 200.0)
-    results = cmds.getAttr(f"{node_name}.frequency")
+    cmds.setAttr(f"{NODE_NAME}.frequency", 200.0)
+    results = cmds.getAttr(f"{NODE_NAME}.frequency")
     assert results == pytest.approx(200.0)
