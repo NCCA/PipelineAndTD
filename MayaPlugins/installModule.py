@@ -1,19 +1,36 @@
 #!/usr/bin/env python
+"""
+Maya Plugin Module Installer
+
+This script installs a Maya plugin module by creating a .mod file
+in the appropriate Maya preferences directory based on the operating system.
+"""
+
 import os
 import platform
 import sys
 from pathlib import Path
 
-maya_locations = {
+maya_locations: dict[str, str] = {
     "Linux": "/maya",
     "Darwin": "/Library/Preferences/Autodesk/maya",
     "Windows": "\\Documents\\maya\\version",
 }
 
-MODULE_NAME = "MayaPluginDemos"
+MODULE_NAME: str = "MayaPluginDemos"
 
 
-def install_module(location):
+def install_module(location: str) -> None:
+    """
+    Install the Maya module by creating a .mod file in the modules directory.
+
+    Args:
+        location: The path to the Maya preferences directory where the module
+                  file should be installed.
+
+    Returns:
+        None
+    """
     print(f"installing to {location}")
     # first write the module file
     current_dir = Path.cwd()
@@ -21,15 +38,23 @@ def install_module(location):
         print("writing module file")
         with open(location + f"modules/{MODULE_NAME}.mod", "w") as file:
             file.write(f"+ {MODULE_NAME} 1.0 {current_dir}\n")
-            # in this case we are putting modules in the root but in bigger systems we
-            # would use plug-ins
-            # file.write("MAYA_PLUG_IN_PATH +:= plug-ins\n")
+            # by convention plugins are placed in a "plug-ins" folder but can be anywhere
+            file.write("MAYA_PLUG_IN_PATH +:= plug-ins\n")
 
 
-def check_maya_installed(op_sys):
+def check_maya_installed(op_sys: str) -> str:
+    """
+    Check if Maya is installed on the system and return its preferences location.
+    Args:
+        op_sys: The operating system name (e.g., 'Linux', 'Darwin', 'Windows').
+    Returns:
+        The path to the Maya preferences directory.
+    Raises:
+        FileNotFoundError: If the Maya preferences directory cannot be found.
+    """
     mloc = f"{Path.home()}{maya_locations.get(op_sys)}/"
-    if not os.path.isdir(mloc):
-        raise
+    if not Path(mloc).is_dir():
+        raise FileNotFoundError(f"Maya installation not found at: {mloc}")
     return mloc
 
 
@@ -37,7 +62,7 @@ if __name__ == "__main__":
     op_sys = platform.system()
     try:
         m_loc = check_maya_installed(op_sys)
-    except:
+    except FileNotFoundError:
         print("Error can't find maya install")
         sys.exit(os.EX_CONFIG)
 
