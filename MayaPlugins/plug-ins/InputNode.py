@@ -1,7 +1,8 @@
-import maya.api.OpenMaya as OpenMaya
-import sys
 import math
 import random
+import sys
+
+import maya.api.OpenMaya as OpenMaya
 
 # Set this flag to show we are using api 2.0
 maya_useNewAPI = True
@@ -21,9 +22,9 @@ class InputNode(OpenMaya.MPxNode):
         OpenMaya.MPxNode.__init__(self)
 
     # factory to create the node
-    @staticmethod
-    def creator():
-        return InputNode()
+    @classmethod
+    def creator(cls):
+        return cls()
 
     @staticmethod
     def initialize():
@@ -33,17 +34,13 @@ class InputNode(OpenMaya.MPxNode):
 
         # Time attribute
         time_attribute_fn = OpenMaya.MFnUnitAttribute()
-        InputNode.time = time_attribute_fn.create(
-            "time", "t", OpenMaya.MFnUnitAttribute.kTime, 0.0
-        )
+        InputNode.time = time_attribute_fn.create("time", "t", OpenMaya.MFnUnitAttribute.kTime, 0.0)
         time_attribute_fn.storable = False
         time_attribute_fn.keyable = False
         OpenMaya.MPxNode.addAttribute(InputNode.time)
 
         # Data size attribute
-        InputNode.data_size = numeric_attrib_fn.create(
-            "dataSize", "ds", OpenMaya.MFnNumericData.kInt, 10
-        )
+        InputNode.data_size = numeric_attrib_fn.create("dataSize", "ds", OpenMaya.MFnNumericData.kInt, 10)
         numeric_attrib_fn.storable = True
         numeric_attrib_fn.keyable = True
         numeric_attrib_fn.readable = True
@@ -53,9 +50,7 @@ class InputNode(OpenMaya.MPxNode):
         # output set by the compute
 
         array_data_fn = OpenMaya.MFnNumericAttribute()
-        InputNode.output = array_data_fn.create(
-            "output", "o", OpenMaya.MFnNumericData.kFloat, 0.0
-        )
+        InputNode.output = array_data_fn.create("output", "o", OpenMaya.MFnNumericData.kFloat, 0.0)
         array_data_fn.array = True
         array_data_fn.usesArrayDataBuilder = True
 
@@ -125,9 +120,7 @@ class InputNode(OpenMaya.MPxNode):
 def initializePlugin(obj):
     plugin = OpenMaya.MFnPlugin(obj)
     try:
-        plugin.registerNode(
-            "InputNodePy", InputNode.id, InputNode.creator, InputNode.initialize
-        )
+        plugin.registerNode("InputNodePy", InputNode.id, InputNode.creator, InputNode.initialize)
     except:
         sys.stderr.write("Failed to register node\n")
         raise
