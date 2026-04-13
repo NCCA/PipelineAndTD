@@ -23,6 +23,10 @@ ATTRIBUTE_CATEGORY = "Cube Locator"
 # Required for Maya to recognise this as an API 2.0 plugin
 maya_useNewAPI = True
 
+# Module-level list of active MMessage callback IDs.  Cleaned up
+# deterministically in uninitializePlugin so we never rely on __del__.
+_active_callbacks = []
+
 # ---------------------------------------------------------------------------
 # Cube geometry helpers
 # ---------------------------------------------------------------------------
@@ -203,7 +207,9 @@ class CubeLocatorNode(omui.MPxLocatorNode):
         CubeLocatorNode.volume = CubeLocatorNode._make_double_output("volume", "vol")
 
         CubeLocatorNode.colour = CubeLocatorNode._make_color("colour", "col")
-        CubeLocatorNode.textColour = CubeLocatorNode._make_color("textColour", "tc", (1.0, 1.0, 1.0))
+        CubeLocatorNode.textColour = CubeLocatorNode._make_color(
+            "textColour", "tc", (1.0, 1.0, 1.0)
+        )
 
         # --- dependency graph connections ---
         CubeLocatorNode.attributeAffects(CubeLocatorNode.width, CubeLocatorNode.volume)
@@ -256,16 +262,24 @@ class CubeLocatorNodeDrawOverride(omr.MPxDrawOverride):
         self._model_editor_changed_cb = om.MEventMessage.addEventCallback(
             "modelEditorChanged", self._on_model_editor_changed
         )
+        # Register for deterministic cleanup in uninitializePlugin.
+        _active_callbacks.append(self._model_editor_changed_cb)
 
-    def __del__(self):
-        # Guard against the Maya API being partially torn down during plugin
-        # unload, which can cause MMessage.removeCallback to crash.
-        try:
-            if self._model_editor_changed_cb is not None:
-                om.MMessage.removeCallback(self._model_editor_changed_cb)
-                self._model_editor_changed_cb = None
-        except Exception:
-            pass
+    def cleanUp(self):
+        """Remove the event callback while the Maya API is still alive.
+
+        Called from uninitializePlugin (or manually) instead of relying on
+        __del__, which runs at GC time when the API may already be torn down.
+        """
+        cb = self._model_editor_changed_cb
+        if cb is not None:
+            try:
+                om.MMessage.removeCallback(cb)
+            except Exception:
+                pass
+            if cb in _active_callbacks:
+                _active_callbacks.remove(cb)
+            self._model_editor_changed_cb = None
 
     # ------------------------------------------------------------------
     def _on_model_editor_changed(self, *args):
@@ -383,7 +397,9 @@ class CubeLocatorNodeDrawOverride(omr.MPxDrawOverride):
         draw_manager.setDepthPriority(5)
 
         display_style = frame_context.getDisplayStyle()
-        shaded = display_style & (omr.MFrameContext.kGouraudShaded | omr.MFrameContext.kFlatShaded)
+        shaded = display_style & (
+            omr.MFrameContext.kGouraudShaded | omr.MFrameContext.kFlatShaded
+        )
 
         # Filled faces in any shaded display mode using a single flat colour.
         if shaded:
@@ -406,7 +422,9 @@ class CubeLocatorNodeDrawOverride(omr.MPxDrawOverride):
         draw_manager.setColor(data.text_colour)
         draw_manager.setFontSize(omr.MUIDrawManager.kSmallFontSize)
         pos_label = om.MPoint(data.center.x, data.center.y + 0.15, data.center.z)
-        draw_manager.text(pos_label, f"{data.label} ({data.volume_text})", omr.MUIDrawManager.kCenter)
+        draw_manager.text(
+            pos_label, f"{data.label} ({data.volume_text})", omr.MUIDrawManager.kCenter
+        )
 
         draw_manager.endDrawable()
 
@@ -435,6 +453,16 @@ def initializePlugin(obj):
 
 def uninitializePlugin(obj):
     plugin = om.MFnPlugin(obj)
+
+    # Remove all event callbacks registered by draw-override instances while
+    # the Maya API is still fully alive.  This prevents crashes that occur
+    # when __del__ runs during GC after the API is partially torn down.
+    for cb in list(_active_callbacks):
+        try:
+            om.MMessage.removeCallback(cb)
+        except Exception:
+            pass
+    _active_callbacks.clear()
 
     omr.MDrawRegistry.deregisterDrawOverrideCreator(
         CubeLocatorNode.draw_db_classification,
