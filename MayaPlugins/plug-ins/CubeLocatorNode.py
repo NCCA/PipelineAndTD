@@ -148,6 +148,11 @@ class CubeLocatorNode(omui.MPxLocatorNode):
     def creator(cls):
         return cls()
 
+    def postConstructor(self):
+        print("post constructor called")
+        fn = om.MFnDependencyNode(self.thisMObject())
+        fn.setName("cubeLocatorNodeShape#")
+
     # ------------------------------------------------------------------
     # Attribute factory helpers
     # ------------------------------------------------------------------
