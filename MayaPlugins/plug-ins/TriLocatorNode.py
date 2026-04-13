@@ -66,7 +66,7 @@ class TriLocatorNode(omui.MPxLocatorNode):
 
     def postConstructor(self):
         fn = om.MFnDependencyNode(self.thisMObject())
-        fn.setName("triLocatorNode#")
+        fn.setName("triLocatorNodeShape#")
 
     @staticmethod
     def initialize():
