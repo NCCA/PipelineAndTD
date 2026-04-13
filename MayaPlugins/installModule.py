@@ -32,15 +32,18 @@ def install_module(location: str) -> None:
         None
     """
     print(f"installing to {location}")
-    # first write the module file
     current_dir = Path.cwd()
-    if not Path(location + f"modules/{MODULE_NAME}.mod").is_file():
-        print("writing module file")
-        with open(location + f"modules/{MODULE_NAME}.mod", "w") as file:
-            file.write(f"+ {MODULE_NAME} 1.0 {current_dir}\n")
-            # by convention plugins are placed in a "plug-ins" folder but can be anywhere
-            file.write("MAYA_PLUG_IN_PATH +:= plug-ins\n")
-            file.write("PYTHONPATH +:= plug-ins/AETemplates\n")
+    mod_path = Path(location + f"modules/{MODULE_NAME}.mod")
+    if mod_path.is_file():
+        response = input(f"{mod_path} already exists. Replace? [y/N]: ").strip().lower()
+        if response != "y":
+            print("installation cancelled")
+            return
+    print("writing module file")
+    with open(mod_path, "w") as file:
+        file.write(f"+ {MODULE_NAME} 1.0 {current_dir}\n")
+        file.write("MAYA_PLUG_IN_PATH +:= plug-ins\n")
+        file.write("MAYA_SCRIPT_PATH +:= plug-ins/AETemplates\n")
 
 
 def check_maya_installed(op_sys: str) -> str:

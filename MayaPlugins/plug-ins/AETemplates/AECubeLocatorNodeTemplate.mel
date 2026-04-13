@@ -1,0 +1,23 @@
+// AECubeLocatorNodeTemplate.mel
+// MEL wrapper that delegates to the Python AE template class.
+// This file must live on MAYA_SCRIPT_PATH (or in an AETemplates/
+// subdirectory of a MAYA_SCRIPT_PATH entry) so Maya can discover it.
+
+global proc AECubeLocatorNodeTemplate(string $nodeName)
+{
+    editorTemplate -beginScrollLayout;
+
+        editorTemplate -beginLayout "Cube Locator" -collapse 0;
+            editorTemplate -addControl "width";
+            editorTemplate -addControl "height";
+            editorTemplate -addControl "depth";
+            editorTemplate -addControl "colour";
+            editorTemplate -addControl "textColour";
+        editorTemplate -endLayout;
+
+        editorTemplate -suppress "volume";
+
+        editorTemplate -addExtraControls;
+
+    editorTemplate -endScrollLayout;
+}
