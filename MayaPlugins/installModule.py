@@ -40,6 +40,7 @@ def install_module(location: str) -> None:
             file.write(f"+ {MODULE_NAME} 1.0 {current_dir}\n")
             # by convention plugins are placed in a "plug-ins" folder but can be anywhere
             file.write("MAYA_PLUG_IN_PATH +:= plug-ins\n")
+            file.write("PYTHONPATH +:= plug-ins/AETemplates\n")
 
 
 def check_maya_installed(op_sys: str) -> str:

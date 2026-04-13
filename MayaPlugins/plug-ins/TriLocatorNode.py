@@ -57,7 +57,6 @@ class TriLocatorNode(omui.MPxLocatorNode):
     type_id = om.MTypeId(0x8001C)
     draw_db_classification = "drawdb/geometry/TriLocator"
     draw_registrant_id = "TriManipPlugin"
-
     # Attribute handle (set during initialize)
     size = None
 
