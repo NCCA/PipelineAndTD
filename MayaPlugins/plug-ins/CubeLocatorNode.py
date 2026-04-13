@@ -249,11 +249,6 @@ class CubeLocatorNodeDrawOverride(omr.MPxDrawOverride):
 
     # ------------------------------------------------------------------
     def __init__(self, obj):
-        # isAlwaysDirty=True (the default) tells Maya to call
-        # prepareForDraw / addUIDrawables on every refresh without needing
-        # an explicit dirty notification.  This avoids the need for a
-        # modelEditorChanged callback whose teardown during File > New or
-        # plugin unload is prone to crashing Maya.
         super().__init__(obj, None, True)
         self._current_bbox = om.MBoundingBox()
 

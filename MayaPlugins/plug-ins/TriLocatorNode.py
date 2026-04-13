@@ -64,6 +64,10 @@ class TriLocatorNode(omui.MPxLocatorNode):
     def creator(cls):
         return cls()
 
+    def postConstructor(self):
+        fn = om.MFnDependencyNode(self.thisMObject())
+        fn.setName("triLocatorNode#")
+
     @staticmethod
     def initialize():
         unit_attr = om.MFnUnitAttribute()
@@ -100,27 +104,9 @@ class TriLocatorNodeDrawOverride(omr.MPxDrawOverride):
     # Construction / destruction
     # ------------------------------------------------------------------
     def __init__(self, obj):
-        # isAlwaysDirty=False for better performance; we manually mark
-        # dirty via the modelEditorChanged callback.
         super().__init__(obj, None, False)
         self._locator_obj = obj
         self._current_bbox = om.MBoundingBox()
-        self._model_editor_changed_cb = om.MEventMessage.addEventCallback(
-            "modelEditorChanged", self._on_model_editor_changed
-        )
-
-    def __del__(self):
-        if self._model_editor_changed_cb is not None:
-            om.MMessage.removeCallback(self._model_editor_changed_cb)
-            self._model_editor_changed_cb = None
-
-    # ------------------------------------------------------------------
-    # Callbacks
-    # ------------------------------------------------------------------
-    def _on_model_editor_changed(self, *args):
-        """Mark geometry dirty so it redraws on display-mode changes
-        (e.g. wireframe <-> shaded)."""
-        omr.MRenderer.setGeometryDrawDirty(self._locator_obj)
 
     # ------------------------------------------------------------------
     # Factory
