@@ -207,9 +207,7 @@ class CubeLocatorNode(omui.MPxLocatorNode):
         CubeLocatorNode.volume = CubeLocatorNode._make_double_output("volume", "vol")
 
         CubeLocatorNode.colour = CubeLocatorNode._make_color("colour", "col")
-        CubeLocatorNode.textColour = CubeLocatorNode._make_color(
-            "textColour", "tc", (1.0, 1.0, 1.0)
-        )
+        CubeLocatorNode.textColour = CubeLocatorNode._make_color("textColour", "tc", (1.0, 1.0, 1.0))
 
         # --- dependency graph connections ---
         CubeLocatorNode.attributeAffects(CubeLocatorNode.width, CubeLocatorNode.volume)
@@ -397,9 +395,7 @@ class CubeLocatorNodeDrawOverride(omr.MPxDrawOverride):
         draw_manager.setDepthPriority(5)
 
         display_style = frame_context.getDisplayStyle()
-        shaded = display_style & (
-            omr.MFrameContext.kGouraudShaded | omr.MFrameContext.kFlatShaded
-        )
+        shaded = display_style & (omr.MFrameContext.kGouraudShaded | omr.MFrameContext.kFlatShaded)
 
         # Filled faces in any shaded display mode using a single flat colour.
         if shaded:
@@ -422,9 +418,7 @@ class CubeLocatorNodeDrawOverride(omr.MPxDrawOverride):
         draw_manager.setColor(data.text_colour)
         draw_manager.setFontSize(omr.MUIDrawManager.kSmallFontSize)
         pos_label = om.MPoint(data.center.x, data.center.y + 0.15, data.center.z)
-        draw_manager.text(
-            pos_label, f"{data.label} ({data.volume_text})", omr.MUIDrawManager.kCenter
-        )
+        draw_manager.text(pos_label, f"{data.label} ({data.volume_text})", omr.MUIDrawManager.kCenter)
 
         draw_manager.endDrawable()
 
