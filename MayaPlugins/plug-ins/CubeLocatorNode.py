@@ -23,10 +23,6 @@ ATTRIBUTE_CATEGORY = "Cube Locator"
 # Required for Maya to recognise this as an API 2.0 plugin
 maya_useNewAPI = True
 
-# Module-level list of active MMessage callback IDs.  Cleaned up
-# deterministically in uninitializePlugin so we never rely on __del__.
-_active_callbacks = []
-
 # ---------------------------------------------------------------------------
 # Cube geometry helpers
 # ---------------------------------------------------------------------------
@@ -255,39 +251,13 @@ class CubeLocatorNodeDrawOverride(omr.MPxDrawOverride):
 
     # ------------------------------------------------------------------
     def __init__(self, obj):
-        # isAlwaysDirty=False; we mark dirty via callback instead
-        super().__init__(obj, None, False)
-        self._locator_obj = obj
+        # isAlwaysDirty=True (the default) tells Maya to call
+        # prepareForDraw / addUIDrawables on every refresh without needing
+        # an explicit dirty notification.  This avoids the need for a
+        # modelEditorChanged callback whose teardown during File > New or
+        # plugin unload is prone to crashing Maya.
+        super().__init__(obj, None, True)
         self._current_bbox = om.MBoundingBox()
-        self._model_editor_changed_cb = om.MEventMessage.addEventCallback(
-            "modelEditorChanged", self._on_model_editor_changed
-        )
-        # Register for deterministic cleanup in uninitializePlugin.
-        _active_callbacks.append(self._model_editor_changed_cb)
-
-    def cleanUp(self):
-        """Remove the event callback while the Maya API is still alive.
-
-        Called from uninitializePlugin (or manually) instead of relying on
-        __del__, which runs at GC time when the API may already be torn down.
-        """
-        cb = self._model_editor_changed_cb
-        if cb is not None:
-            try:
-                om.MMessage.removeCallback(cb)
-            except Exception:
-                pass
-            if cb in _active_callbacks:
-                _active_callbacks.remove(cb)
-            self._model_editor_changed_cb = None
-
-    # ------------------------------------------------------------------
-    def _on_model_editor_changed(self, *args):
-        # The node may have been deleted (file new / scene clear) before the
-        # draw override is destroyed.  Calling setGeometryDrawDirty with an
-        # invalid MObject crashes Maya, so check validity first.
-        if self._locator_obj is not None and not self._locator_obj.isNull():
-            omr.MRenderer.setGeometryDrawDirty(self._locator_obj)
 
     # ------------------------------------------------------------------
     @staticmethod
@@ -453,16 +423,6 @@ def initializePlugin(obj):
 
 def uninitializePlugin(obj):
     plugin = om.MFnPlugin(obj)
-
-    # Remove all event callbacks registered by draw-override instances while
-    # the Maya API is still fully alive.  This prevents crashes that occur
-    # when __del__ runs during GC after the API is partially torn down.
-    for cb in list(_active_callbacks):
-        try:
-            om.MMessage.removeCallback(cb)
-        except Exception:
-            pass
-    _active_callbacks.clear()
 
     omr.MDrawRegistry.deregisterDrawOverrideCreator(
         CubeLocatorNode.draw_db_classification,
