@@ -45,6 +45,7 @@ def install_module(location: str) -> None:
         file.write("MAYA_PLUG_IN_PATH +:= plug-ins\n")
         file.write("MAYA_SCRIPT_PATH +:= plug-ins/AETemplates\n")
         file.write("XBMLANGPATH +:= plug-ins/icons\n")
+        file.write("PYTHONPATH +:= plug-ins/modules\n")
 
 
 def check_maya_installed(op_sys: str) -> str:

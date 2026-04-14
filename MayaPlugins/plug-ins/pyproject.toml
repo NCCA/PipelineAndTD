@@ -1,0 +1,17 @@
+[project]
+name = "MayaPlugins"
+version = "0.1.0"
+authors = [{ name = "Jon Macey", email = "jmacey@bournemouth.ac.uk" }]
+requires-python = ">=3.11"
+
+dependencies = [
+]
+
+
+# pyproject.toml
+[tool.pytest.ini_options]
+addopts = "-ra "
+testpaths = [
+    "tests",
+]
+pythonpath = ["modules"]
