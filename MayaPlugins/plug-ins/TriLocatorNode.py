@@ -71,7 +71,9 @@ class TriLocatorNode(omui.MPxLocatorNode):
     @staticmethod
     def initialize():
         unit_attr = om.MFnUnitAttribute()
-        TriLocatorNode.size = unit_attr.create("size", "sz", om.MFnUnitAttribute.kDistance)
+        TriLocatorNode.size = unit_attr.create(
+            "size", "sz", om.MFnUnitAttribute.kDistance
+        )
         unit_attr.default = om.MDistance(1.0)
         unit_attr.storable = True
         unit_attr.writable = True

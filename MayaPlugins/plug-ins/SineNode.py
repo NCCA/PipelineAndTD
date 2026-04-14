@@ -31,14 +31,18 @@ class SineNode(OpenMaya.MPxNode):
     def initialize():
         # Create the attributes
         numeric_attrib_fn = OpenMaya.MFnNumericAttribute()
-        SineNode.amplitude = numeric_attrib_fn.create("amplitude", "a", OpenMaya.MFnNumericData.kDouble, 1.0)
+        SineNode.amplitude = numeric_attrib_fn.create(
+            "amplitude", "a", OpenMaya.MFnNumericData.kDouble, 1.0
+        )
         numeric_attrib_fn.storable = True
         numeric_attrib_fn.keyable = True
         numeric_attrib_fn.readable = True
         numeric_attrib_fn.writable = True
         OpenMaya.MPxNode.addAttribute(SineNode.amplitude)
         # add frequency attribute
-        SineNode.frequency = numeric_attrib_fn.create("frequency", "f", OpenMaya.MFnNumericData.kDouble, 1.0)
+        SineNode.frequency = numeric_attrib_fn.create(
+            "frequency", "f", OpenMaya.MFnNumericData.kDouble, 1.0
+        )
         numeric_attrib_fn.storable = True
         numeric_attrib_fn.keyable = True
         numeric_attrib_fn.readable = True
@@ -58,12 +62,16 @@ class SineNode(OpenMaya.MPxNode):
 
         # Time attribute
         time_attribute_fn = OpenMaya.MFnUnitAttribute()
-        SineNode.time = time_attribute_fn.create("time", "t", OpenMaya.MFnUnitAttribute.kTime, 0.0)
+        SineNode.time = time_attribute_fn.create(
+            "time", "t", OpenMaya.MFnUnitAttribute.kTime, 0.0
+        )
         time_attribute_fn.storable = False
         time_attribute_fn.keyable = False
         OpenMaya.MPxNode.addAttribute(SineNode.time)
         # output set by the compute
-        SineNode.output = numeric_attrib_fn.create("output", "o", OpenMaya.MFnNumericData.kDouble, 0.0)
+        SineNode.output = numeric_attrib_fn.create(
+            "output", "o", OpenMaya.MFnNumericData.kDouble, 0.0
+        )
         numeric_attrib_fn.storable = False
         numeric_attrib_fn.keyable = False
         numeric_attrib_fn.readable = True
@@ -98,13 +106,27 @@ class SineNode(OpenMaya.MPxNode):
             function_type = data.inputValue(SineNode.function_type).asShort()
             # compute the result
             if function_type == 0:
-                result = amplitude * math.sin(math.radians(frequency * math.pi * time.asUnits(OpenMaya.MTime.kSeconds)))
+                result = amplitude * math.sin(
+                    math.radians(
+                        frequency * math.pi * time.asUnits(OpenMaya.MTime.kSeconds)
+                    )
+                )
             elif function_type == 1:
-                result = amplitude * math.cos(math.radians(frequency * math.pi * time.asUnits(OpenMaya.MTime.kSeconds)))
+                result = amplitude * math.cos(
+                    math.radians(
+                        frequency * math.pi * time.asUnits(OpenMaya.MTime.kSeconds)
+                    )
+                )
             else:
                 result = amplitude * math.sin(
-                    math.radians(frequency * math.pi * time.asUnits(OpenMaya.MTime.kSeconds))
-                ) + amplitude * math.sin(math.radians(2 * frequency * math.pi * time.asUnits(OpenMaya.MTime.kSeconds)))
+                    math.radians(
+                        frequency * math.pi * time.asUnits(OpenMaya.MTime.kSeconds)
+                    )
+                ) + amplitude * math.sin(
+                    math.radians(
+                        2 * frequency * math.pi * time.asUnits(OpenMaya.MTime.kSeconds)
+                    )
+                )
             # set the output
             output_data = data.outputValue(SineNode.output)
             output_data.setDouble(result)
@@ -112,26 +134,13 @@ class SineNode(OpenMaya.MPxNode):
             return True
         return False
 
-    def postConstructor(self):
-        """
-        Description
-
-           When instances of this node are created internally, the MObject associated
-           with the instance is not created until after the constructor of this class
-           is called. This means that no member functions of Node can
-           be called in the constructor.
-           The postConstructor solves this problem. Maya will call this function
-           after the internal object has been created.
-           As a general rule do all of your initialization in the postConstructor.
-           Not used here but for info
-        """
-        print("postConstructor called")
-
 
 def initializePlugin(obj):
     plugin = OpenMaya.MFnPlugin(obj)
     try:
-        plugin.registerNode("SineNodePy", SineNode.id, SineNode.creator, SineNode.initialize)
+        plugin.registerNode(
+            "SineNodePy", SineNode.id, SineNode.creator, SineNode.initialize
+        )
     except:
         sys.stderr.write("Failed to register node\n")
         raise

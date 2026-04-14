@@ -1,12 +1,3 @@
-import os
-import sys
-
-import CustomSphere
-import maya.standalone
-import pytest
-
-
-
 def test_CustomSphere(maya_standalone):
     # Create a sphere
     #

@@ -1,12 +1,8 @@
 import math
-import os
-import sys
 
 import maya.api.OpenMaya as OpenMaya
 import maya.cmds as cmds
-import maya.standalone
 import pytest
-import SineNode
 
 NODE_NAME = "TestSineNode"
 PLUGIN_NAME = "SineNode.py"
@@ -42,7 +38,6 @@ def test_defaultOutput(load_plugin):
 
 
 def test_setAttrib(load_plugin):
-
     amplitude = 2.0
     frequency = 200.0
     time = OpenMaya.MTime(1.0, OpenMaya.MTime.kSeconds)

@@ -82,7 +82,9 @@ def initializePlugin(plugin):
     try:
         plugin_fn.registerCommand(CustomSphere.CMD_NAME, CustomSphere.creator)
     except:
-        OpenMaya.MGlobal.displayError("Failed to register command: {0}".format(CustomSphere.CMD_NAME))
+        OpenMaya.MGlobal.displayError(
+            "Failed to register command: {0}".format(CustomSphere.CMD_NAME)
+        )
 
 
 def uninitializePlugin(plugin):
@@ -93,7 +95,9 @@ def uninitializePlugin(plugin):
     try:
         plugin_fn.deregisterCommand(CustomSphere.CMD_NAME)
     except:
-        OpenMaya.MGlobal.displayError("Failed to deregister command: {0}".format(CustomSphere.CMD_NAME))
+        OpenMaya.MGlobal.displayError(
+            "Failed to deregister command: {0}".format(CustomSphere.CMD_NAME)
+        )
 
 
 if __name__ == "__main__":
@@ -105,7 +109,9 @@ if __name__ == "__main__":
 
     plugin_name = "CustomSphere.py"
 
-    cmds.evalDeferred('if cmds.pluginInfo("f{plugin_name}", q=True, loaded=True): cmds.unloadPlugin(f"{plugin_name}")')
+    cmds.evalDeferred(
+        'if cmds.pluginInfo("f{plugin_name}", q=True, loaded=True): cmds.unloadPlugin(f"{plugin_name}")'
+    )
 
     cmds.evalDeferred(
         'if not cmds.pluginInfo(f"{plugin_name}", q=True, loaded=True): cmds.loadPlugin(f"{plugin_name}")'

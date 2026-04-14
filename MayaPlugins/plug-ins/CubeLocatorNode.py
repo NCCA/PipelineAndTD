@@ -156,8 +156,8 @@ class CubeLocatorNode(omui.MPxLocatorNode):
     # ------------------------------------------------------------------
     # Attribute factory helpers
     # ------------------------------------------------------------------
-    @staticmethod
-    def _make_distance(name, short, default_cm=1.0):
+    @classmethod
+    def _make_distance(cls, name, short, default_cm=1.0):
         fn = om.MFnUnitAttribute()
         attr = fn.create(name, short, om.MFnUnitAttribute.kDistance)
         fn.default = om.MDistance(default_cm)
@@ -165,11 +165,11 @@ class CubeLocatorNode(omui.MPxLocatorNode):
         fn.writable = True
         fn.keyable = True
         fn.addToCategory(ATTRIBUTE_CATEGORY)
-        CubeLocatorNode.addAttribute(attr)
+        cls.addAttribute(attr)
         return attr
 
-    @staticmethod
-    def _make_double_output(name, short):
+    @classmethod
+    def _make_double_attribute(cls, name, short):
         fn = om.MFnNumericAttribute()
         attr = fn.create(name, short, om.MFnNumericData.kDouble, 0.0)
         fn.storable = False
@@ -177,11 +177,11 @@ class CubeLocatorNode(omui.MPxLocatorNode):
         fn.readable = True
         fn.cached = False
         fn.addToCategory(ATTRIBUTE_CATEGORY)
-        CubeLocatorNode.addAttribute(attr)
+        cls.addAttribute(attr)
         return attr
 
-    @staticmethod
-    def _make_color(name, short, default=(1.0, 1.0, 1.0)):
+    @classmethod
+    def _make_color(cls, name, short, default=(1.0, 1.0, 1.0)):
         fn = om.MFnNumericAttribute()
         attr = fn.createColor(name, short)
         fn.default = default
@@ -190,7 +190,7 @@ class CubeLocatorNode(omui.MPxLocatorNode):
         fn.keyable = False
         fn.channelBox = True
         fn.addToCategory(ATTRIBUTE_CATEGORY)
-        CubeLocatorNode.addAttribute(attr)
+        cls.addAttribute(attr)
         return attr
 
     # ------------------------------------------------------------------
@@ -200,7 +200,7 @@ class CubeLocatorNode(omui.MPxLocatorNode):
         CubeLocatorNode.height = CubeLocatorNode._make_distance("height", "h")
         CubeLocatorNode.depth = CubeLocatorNode._make_distance("depth", "dp")
 
-        CubeLocatorNode.volume = CubeLocatorNode._make_double_output("volume", "vol")
+        CubeLocatorNode.volume = CubeLocatorNode._make_double_attribute("volume", "vol")
 
         CubeLocatorNode.colour = CubeLocatorNode._make_color("colour", "col")
         CubeLocatorNode.textColour = CubeLocatorNode._make_color("textColour", "tc", (1.0, 1.0, 1.0))

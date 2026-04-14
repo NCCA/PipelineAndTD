@@ -1,4 +1,3 @@
-import math
 import random
 import sys
 
@@ -34,13 +33,17 @@ class InputNode(OpenMaya.MPxNode):
 
         # Time attribute
         time_attribute_fn = OpenMaya.MFnUnitAttribute()
-        InputNode.time = time_attribute_fn.create("time", "t", OpenMaya.MFnUnitAttribute.kTime, 0.0)
+        InputNode.time = time_attribute_fn.create(
+            "time", "t", OpenMaya.MFnUnitAttribute.kTime, 0.0
+        )
         time_attribute_fn.storable = False
         time_attribute_fn.keyable = False
         OpenMaya.MPxNode.addAttribute(InputNode.time)
 
         # Data size attribute
-        InputNode.data_size = numeric_attrib_fn.create("dataSize", "ds", OpenMaya.MFnNumericData.kInt, 10)
+        InputNode.data_size = numeric_attrib_fn.create(
+            "dataSize", "ds", OpenMaya.MFnNumericData.kInt, 10
+        )
         numeric_attrib_fn.storable = True
         numeric_attrib_fn.keyable = True
         numeric_attrib_fn.readable = True
@@ -50,7 +53,9 @@ class InputNode(OpenMaya.MPxNode):
         # output set by the compute
 
         array_data_fn = OpenMaya.MFnNumericAttribute()
-        InputNode.output = array_data_fn.create("output", "o", OpenMaya.MFnNumericData.kFloat, 0.0)
+        InputNode.output = array_data_fn.create(
+            "output", "o", OpenMaya.MFnNumericData.kFloat, 0.0
+        )
         array_data_fn.array = True
         array_data_fn.usesArrayDataBuilder = True
 
@@ -87,7 +92,9 @@ class InputNode(OpenMaya.MPxNode):
             data_size = data.inputValue(InputNode.data_size).asInt()
 
             data_block = self.forceCache()
-            array_builder = OpenMaya.MArrayDataBuilder(data_block, self.output, data_size)
+            array_builder = OpenMaya.MArrayDataBuilder(
+                data_block, self.output, data_size
+            )
 
             output_array_builder = array_data_handle.builder()
             OpenMaya.MGlobal.displayInfo("Data size: " + str(data_size))
@@ -120,7 +127,9 @@ class InputNode(OpenMaya.MPxNode):
 def initializePlugin(obj):
     plugin = OpenMaya.MFnPlugin(obj)
     try:
-        plugin.registerNode("InputNodePy", InputNode.id, InputNode.creator, InputNode.initialize)
+        plugin.registerNode(
+            "InputNodePy", InputNode.id, InputNode.creator, InputNode.initialize
+        )
     except:
         sys.stderr.write("Failed to register node\n")
         raise

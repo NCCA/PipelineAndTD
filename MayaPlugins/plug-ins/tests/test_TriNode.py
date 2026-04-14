@@ -1,10 +1,5 @@
-import os
-import sys
-
 import maya.cmds as cmds
-import maya.standalone
 import pytest
-import SineNode
 
 NODE_NAME = "TestSineNode"
 PLUGIN_NAME = "TriLocatorNode.py"
