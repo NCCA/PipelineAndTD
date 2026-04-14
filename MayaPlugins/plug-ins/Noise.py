@@ -1,10 +1,26 @@
 """
-Perlin noise implementation in Python/NumPy.
+Gradient Perlin noise in Python/NumPy.
 
 Ported from C++ by Jon Macey (Noise.h / Noise.cpp), originally based on:
   - "Computer Graphics with OpenGL" by F.S. Hill
   - "Texturing and Modeling" by Ebert et al.
   - Contributions from Ian Stephenson
+
+This implementation replaces the original value-noise lattice with proper
+gradient noise (Ken Perlin, 2002).  Value noise — where a random scalar is
+stored at each lattice point — produces the ridge/stripe artefacts visible
+when mapped to a mesh, because the hash PERM(i + PERM(j + PERM(k))) does
+not decorrelate the three axes well enough at small table sizes.
+
+Gradient noise instead stores a random *unit vector* at every lattice point
+and evaluates the dot product of that gradient with the local offset vector.
+Because the contribution of each corner depends on position relative to that
+corner in all three axes simultaneously, the output is genuinely isotropic.
+
+Public API is identical to the original C++ class:
+  noise(scale, p)                         -> float  (remapped to 0 … 1)
+  turbulence(scale, p)                    -> float
+  complex(steps, persistence, scale, p)  -> float
 
 Usage
 -----
@@ -12,15 +28,11 @@ Usage
     import numpy as np
 
     n = Noise(seed=42)
+    p = np.array([1.2, 3.4, 5.6])
 
-    p = np.array([1.2, 3.4, 5.6])          # 3-D point (x, y, z)
-
-    v  = n.noise(scale=2.0, p=p)            # basic Perlin noise  -> float in [0, 1)
-    t  = n.turbulance(scale=2.0, p=p)       # turbulence          -> float
-    c  = n.complex(steps=4,                 # fBm / complex noise -> float
-                   persistence=2.0,
-                   scale=2.0,
-                   p=p)
+    v = n.noise(scale=2.0, p=p)
+    t = n.turbulence(scale=2.0, p=p)
+    c = n.complex(steps=4, persistence=2.0, scale=2.0, p=p)
 """
 
 from __future__ import annotations
@@ -28,25 +40,43 @@ from __future__ import annotations
 import numpy as np
 from numpy.typing import ArrayLike
 
+# ---------------------------------------------------------------------------
+# 16 canonical gradient directions on a cube (Perlin 2002).
+# Avoiding axis-aligned gradients removes cross-shaped artefacts.
+# ---------------------------------------------------------------------------
+_GRAD3 = np.array(
+    [
+        [1, 1, 0],
+        [-1, 1, 0],
+        [1, -1, 0],
+        [-1, -1, 0],
+        [1, 0, 1],
+        [-1, 0, 1],
+        [1, 0, -1],
+        [-1, 0, -1],
+        [0, 1, 1],
+        [0, -1, 1],
+        [0, 1, -1],
+        [0, -1, -1],
+        [1, 1, 0],
+        [-1, 1, 0],
+        [0, -1, 1],
+        [0, -1, -1],
+    ],
+    dtype=np.float64,
+)
+
 
 class Noise:
-    """Simple Perlin-style noise, mirroring the C++ Noise class."""
-
-    # ------------------------------------------------------------------
-    # Construction / table management
-    # ------------------------------------------------------------------
+    """
+    Gradient Perlin noise — faithful port of Jon Macey's C++ Noise class
+    with the value-noise core replaced by proper gradient noise.
+    """
 
     def __init__(self, seed: int = 1) -> None:
-        """
-        Parameters
-        ----------
-        seed:
-            RNG seed (equivalent to ``setSeed`` + ``resetTables`` in C++).
-        """
         self._seed: int = seed
-        # Tables are populated by reset_tables().
-        self._noise_table: np.ndarray = np.empty(256, dtype=np.float32)
-        self._index: np.ndarray = np.arange(256, dtype=np.uint8)
+        # Doubled permutation table (512 entries) avoids masking on every lookup.
+        self._perm: np.ndarray = np.empty(512, dtype=np.int32)
         self.reset_tables()
 
     # ------------------------------------------------------------------
@@ -59,98 +89,49 @@ class Noise:
 
     @seed.setter
     def seed(self, value: int) -> None:
-        """Equivalent to ``setSeed``; call ``reset_tables`` afterwards."""
+        """Equivalent to setSeed(); call reset_tables() afterwards."""
         self._seed = int(value)
 
     def reset_tables(self) -> None:
         """
-        Re-initialise the noise and index tables using the current seed.
-        Equivalent to ``resetTables()`` in C++.
+        Re-initialise the permutation table using the current seed.
+        Equivalent to resetTables() in C++.
         """
-        rng = np.random.default_rng(self._seed)  # Mersenne Twister
-
-        # Shuffle the index table (matches std::shuffle)
-        self._index = np.arange(256, dtype=np.uint8)
-        rng.shuffle(self._index)
-
-        # Fill noise table with uniform floats in [0, 1)
-        self._noise_table = rng.random(256).astype(np.float32)
+        rng = np.random.default_rng(self._seed)
+        p = np.arange(256, dtype=np.int32)
+        rng.shuffle(p)
+        self._perm = np.concatenate([p, p])  # doubled: no wrap needed
 
     def noise(self, scale: float, p: ArrayLike) -> float:
         """
-        Trilinearly-interpolated lattice noise.
+        Gradient Perlin noise, remapped from [-1, 1] to [0, 1].
 
         Parameters
         ----------
-        scale:
-            Frequency multiplier applied to *p* before sampling.
-        p:
-            3-D point as any sequence ``[x, y, z]``.
+        scale : float
+            Frequency multiplier applied to p before sampling.
+        p : array-like, shape (3,)
+            3-D sample point [x, y, z].
 
         Returns
         -------
-        float
-            Noise value (approximately in [0, 1)).
+        float in [0, 1]
         """
-        px, py, pz = np.asarray(p, dtype=np.float64)[:3]
-        px *= scale
-        py *= scale
-        pz *= scale
-
-        # Floor toward -inf (matches C behaviour for negative coords too)
-        ix, iy, iz = int(np.floor(px)), int(np.floor(py)), int(np.floor(pz))
-        tx = px - ix
-        ty = py - iy
-        tz = pz - iz
-
-        # Quintic fade (Perlin 2002): 6t^5 - 15t^4 + 10t^3
-        # Removes the linear banding visible with a raw lerp.
-        tx = _fade(tx)
-        ty = _fade(ty)
-        tz = _fade(tz)
-
-        # Sample the 2x2x2 neighbourhood
-        d = np.empty((2, 2, 2), dtype=np.float32)
-        for k in range(2):
-            for j in range(2):
-                for i in range(2):
-                    d[k, j, i] = self._lattice_noise(ix + i, iy + j, iz + k)
-
-        # Trilinear interpolation (matches C++ lerp chain)
-        x0 = _lerp(d[0, 0, 0], d[0, 0, 1], tx)
-        x1 = _lerp(d[0, 1, 0], d[0, 1, 1], tx)
-        x2 = _lerp(d[1, 0, 0], d[1, 0, 1], tx)
-        x3 = _lerp(d[1, 1, 0], d[1, 1, 1], tx)
-
-        y0 = _lerp(x0, x1, ty)
-        y1 = _lerp(x2, x3, ty)
-
-        return float(_lerp(y0, y1, tz))
+        raw = self._gradient_noise(scale, p)
+        return float(np.clip(raw * 0.5 + 0.5, 0.0, 1.0))
 
     def turbulence(self, scale: float, p: ArrayLike) -> float:
         """
-        Turbulence: sum of noise at increasing frequencies with decreasing
-        amplitude (4 octaves).
-
-        Parameters
-        ----------
-        scale:
-            Base frequency.
-        p:
-            3-D point.
-
-        Returns
-        -------
-        float
-            Turbulence value.
+        Turbulence: 4-octave sum with decreasing amplitude.
+        Equivalent to the C++ turbulence() method.
         """
         val = (
-            self.noise(scale, p) / 2.0
-            + self.noise(2.0 * scale, p) / 4.0
-            + self.noise(4.0 * scale, p) / 8.0
-            + self.noise(8.0 * scale, p) / 16.0
+            self._gradient_noise(scale, p) / 2.0
+            + self._gradient_noise(2.0 * scale, p) / 4.0
+            + self._gradient_noise(4.0 * scale, p) / 8.0
+            + self._gradient_noise(8.0 * scale, p) / 16.0
         )
-        return float(val)
+        return float(np.clip(val * 0.5 + 0.5, 0.0, 1.0))
 
     def complex(
         self,
@@ -161,65 +142,114 @@ class Noise:
     ) -> float:
         """
         Fractional Brownian Motion (fBm) / complex noise.
-
-        Based on http://freespace.virgin.net/hugo.elias/models/m_perlin.htm
+        Equivalent to the C++ complex() method.
 
         Parameters
         ----------
-        steps:
+        steps : int
             Number of octaves.
-        persistence:
-            Controls how quickly amplitude falls off per octave.
-            Higher → smoother; lower → rougher.
-        scale:
+        persistence : float
+            Amplitude fall-off per octave (higher = smoother).
+        scale : float
             Base frequency.
-        p:
-            3-D point.
-
-        Returns
-        -------
-        float
-            Accumulated noise value.
+        p : array-like
+            3-D sample point.
         """
         val = 0.0
         for i in range(1, steps + 1):
-            val += self.noise(i * scale, p) / (persistence**i)
+            val += self._gradient_noise(i * scale, p) / (persistence**i)
         return float(val)
 
     # ------------------------------------------------------------------
-    # Private helpers
+    # Core gradient noise implementation
     # ------------------------------------------------------------------
 
-    def _perm(self, x: int) -> int:
-        """Wrap x into [0, 255] and look up the permutation table."""
-        return int(self._index[x & 255])
+    def _gradient_noise(self, scale: float, p: ArrayLike) -> float:
+        """
+        Raw gradient Perlin noise in approximately [-1, 1].
 
-    def _lattice_noise(self, i: int, j: int, k: int) -> float:
+        Algorithm
+        ---------
+        For each of the 8 corners of the unit cube surrounding the sample
+        point we:
+          1. Hash the corner coordinates via the doubled permutation table.
+          2. Select a gradient vector from the 16 canonical directions.
+          3. Compute the dot product of that gradient with the distance
+             vector from the corner to the sample point.
+          4. Trilinearly interpolate all 8 contributions using the quintic
+             fade curve, ensuring C2-continuous derivatives at boundaries.
         """
-        Equivalent to the C++ ``INDEX`` / ``PERM`` macros:
-            PERM(i + PERM(j + PERM(k)))
-        """
-        idx = self._perm(i + self._perm(j + self._perm(k)))
-        return float(self._noise_table[idx])
+        arr = np.asarray(p, dtype=np.float64)[:3]
+        px, py, pz = arr * scale
+
+        # Integer cell coords, floored toward -inf (handles negatives correctly)
+        X = int(np.floor(px)) & 255
+        Y = int(np.floor(py)) & 255
+        Z = int(np.floor(pz)) & 255
+
+        # Fractional offsets within the cell
+        fx = px - np.floor(px)
+        fy = py - np.floor(py)
+        fz = pz - np.floor(pz)
+
+        # Quintic fade curves
+        u = _fade(fx)
+        v = _fade(fy)
+        w = _fade(fz)
+
+        # Hash all 8 corners using the doubled perm table
+        perm = self._perm
+        A = perm[X] + Y
+        AA = perm[A] + Z
+        AB = perm[A + 1] + Z
+        B = perm[X + 1] + Y
+        BA = perm[B] + Z
+        BB = perm[B + 1] + Z
+
+        # Gradient dot products at each corner
+        g000 = _grad(perm[AA], fx, fy, fz)
+        g100 = _grad(perm[BA], fx - 1, fy, fz)
+        g010 = _grad(perm[AB], fx, fy - 1, fz)
+        g110 = _grad(perm[BB], fx - 1, fy - 1, fz)
+        g001 = _grad(perm[AA + 1], fx, fy, fz - 1)
+        g101 = _grad(perm[BA + 1], fx - 1, fy, fz - 1)
+        g011 = _grad(perm[AB + 1], fx, fy - 1, fz - 1)
+        g111 = _grad(perm[BB + 1], fx - 1, fy - 1, fz - 1)
+
+        # Trilinear interpolation
+        x00 = _lerp(g000, g100, u)
+        x10 = _lerp(g010, g110, u)
+        x01 = _lerp(g001, g101, u)
+        x11 = _lerp(g011, g111, u)
+
+        y0 = _lerp(x00, x10, v)
+        y1 = _lerp(x01, x11, v)
+
+        return _lerp(y0, y1, w)
 
 
 # ---------------------------------------------------------------------------
-# Module-level helper (matches the C++ template lerp)
+# Module-level helpers
 # ---------------------------------------------------------------------------
-
-
-def _lerp(a: float, b: float, t: float) -> float:
-    """Linear interpolation: a + (b - a) * t."""
-    return a + (b - a) * t
 
 
 def _fade(t: float) -> float:
-    """
-    Quintic smoothstep fade (Ken Perlin, 2002): 6t^5 - 15t^4 + 10t^3.
-    Maps [0,1] -> [0,1] with zero first- and second-derivatives at the
-    endpoints, eliminating the linear banding produced by a plain lerp.
-    """
+    """Quintic smoothstep: 6t^5 - 15t^4 + 10t^3 (C2-continuous at 0 and 1)."""
     return t * t * t * (t * (t * 6.0 - 15.0) + 10.0)
+
+
+def _lerp(a: float, b: float, t: float) -> float:
+    """Linear interpolation."""
+    return a + (b - a) * t
+
+
+def _grad(hash_val: int, x: float, y: float, z: float) -> float:
+    """
+    Pick one of 16 gradient directions via the low 4 bits of hash_val
+    and return its dot product with (x, y, z).
+    """
+    g = _GRAD3[hash_val & 15]
+    return float(g[0] * x + g[1] * y + g[2] * z)
 
 
 # ---------------------------------------------------------------------------
@@ -235,19 +265,39 @@ if __name__ == "__main__":
         [0.5, 0.5, 0.5],
     ]
 
-    print(f"{'Point':<22}  {'noise':>8}  {'turbulance':>10}  {'complex':>8}")
+    print(f"{'Point':<22}  {'noise':>8}  {'turbulence':>10}  {'complex':>8}")
     print("-" * 56)
     for p in test_points:
         v = n.noise(scale=2.0, p=p)
-        t = n.turbulance(scale=2.0, p=p)
+        t = n.turbulence(scale=2.0, p=p)
         c = n.complex(steps=4, persistence=2.0, scale=2.0, p=p)
         print(f"{str(p):<22}  {v:8.5f}  {t:10.5f}  {c:8.5f}")
 
-    # Demonstrate seed reproducibility
+    # Verify isotropy: each axis must vary independently
+    print("\n--- Isotropy check: vary each axis independently (scale=3) ---")
+    for axis, label in enumerate("xyz"):
+        vals = [
+            n.noise(3.0, [(t if axis == 0 else 0.5), (t if axis == 1 else 0.5), (t if axis == 2 else 0.5)])
+            for t in np.linspace(0.1, 0.9, 10)
+        ]
+        spread = max(vals) - min(vals)
+        print(f"  {label}-axis spread: {spread:.4f}  {'OK' if spread > 0.05 else 'FLAT - problem!'}")
+
+    # Seed reproducibility
     print("\n--- Seed reproducibility ---")
     n2 = Noise(seed=42)
     p = [1.2, 3.4, 5.6]
-    print(f"Same seed → noise values match: {n.noise(2.0, p):.6f} == {n2.noise(2.0, p):.6f}")
-
+    print(f"Same seed match : {n.noise(2.0, p):.6f} == {n2.noise(2.0, p):.6f}")
     n3 = Noise(seed=99)
-    print(f"Different seed → values differ: {n.noise(2.0, p):.6f} != {n3.noise(2.0, p):.6f}")
+    print(f"Diff seed differ: {n.noise(2.0, p):.6f} != {n3.noise(2.0, p):.6f}")
+
+    # Cross cell boundaries — smooth and non-linear in all three axes
+    print("\n--- Smoothness across cell boundaries ---")
+    for axis, label in enumerate("xyz"):
+        print(f"  {label}-axis sweep:")
+        for t in np.linspace(0.0, 2.0, 12):
+            pt = [0.5, 0.5, 0.5]
+            pt[axis] = t
+            v = n.noise(1.0, pt)
+            bar = "█" * int(v * 30)
+            print(f"    {label}={t:.2f}  {v:.4f}  {bar}")

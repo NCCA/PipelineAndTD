@@ -28,6 +28,7 @@ class NoiseNode(OpenMaya.MPxNode):
         output = None
         noise_type = None
         self.noise = Noise()
+        self.noise.reset_tables()
         self.seed = 1234.0
 
     # factory to create the node
@@ -118,28 +119,26 @@ class NoiseNode(OpenMaya.MPxNode):
         """
         # we only need to compute if the plug is the output node changing
         if plug == NoiseNode.output:
-            position_data = data.inputValue(NoiseNode.position).asFloatVector()
-            seed_data = data.inputValue(NoiseNode.seed).asInt()
+            position_data = data.inputValue(NoiseNode.position).asDouble3()
+            seed_data = data.inputValue(NoiseNode.seed).asFloat()
             amplitude_data = data.inputValue(NoiseNode.amplitude).asDouble()
             scale_data = data.inputValue(NoiseNode.scale).asDouble()
             step_data = data.inputValue(NoiseNode.step).asDouble()
             persistence_data = data.inputValue(NoiseNode.persistence).asDouble()
-            print(
-                f"position={position_data}, seed={seed_data}, amplitude={amplitude_data}, scale={scale_data}, step={step_data}, persistence={persistence_data}"
-            )
-            print(f"{type(position_data)} ")
 
-            # if seed != self.seed:
-            #     self.noise.seed(seed)
-            #     self.noise.resetTables()
+            # if seed_data != self.seed:
+            #     self.noise.seed(seed_data)
+            #     self.noise.reset_tables()
+            #     self.seed = seed_data
             selected_noise_type = data.inputValue(NoiseNode.noise_type).asInt()
             if selected_noise_type == 0:
-                output = self.noise.noise(scale_data, tuple(position_data)) / amplitude_data
+                output = self.noise.noise(scale_data, tuple(position_data)) * amplitude_data
             elif selected_noise_type == 1:
-                output = self.noise.turbulence(scale_data, tuple(position_data)) / amplitude_data
+                output = self.noise.turbulence(scale_data, tuple(position_data)) * amplitude_data
             elif selected_noise_type == 2:
                 output = (
-                    self.noise.complex(step_data, persistence_data, scale_data, tuple(position_data)) / amplitude_data
+                    self.noise.complex(int(step_data), persistence_data, scale_data, tuple(position_data))
+                    * amplitude_data
                 )
             output_data = data.outputValue(NoiseNode.output)
             output_data.setDouble(output)
