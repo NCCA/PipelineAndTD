@@ -91,12 +91,14 @@ class Noise:
     def seed(self, value: int) -> None:
         """Equivalent to setSeed(); call reset_tables() afterwards."""
         self._seed = int(value)
+        self.reset_tables()
 
     def reset_tables(self) -> None:
         """
         Re-initialise the permutation table using the current seed.
         Equivalent to resetTables() in C++.
         """
+        self._perm: np.ndarray = np.empty(512, dtype=np.int32)
         rng = np.random.default_rng(self._seed)
         p = np.arange(256, dtype=np.int32)
         rng.shuffle(p)

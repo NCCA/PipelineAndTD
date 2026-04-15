@@ -1,4 +1,3 @@
-import math
 import sys
 
 import maya.api.OpenMaya as OpenMaya
@@ -14,22 +13,19 @@ class NoiseNode(OpenMaya.MPxNode):
     # Older plugins used to set these to OpenMaya.MObject() (see api1 demos)
     # however we now just set to None and use the FunctionSets to create the attributes
     id = OpenMaya.MTypeId(0x00105482)
+    seed = None
+    amplitude = None
+    scale = None
+    step = None
+    persistence = None
+    position = None
+    output = None
     noise_type = None
 
     def __init__(self):
         OpenMaya.MPxNode.__init__(self)
-        id = OpenMaya.MTypeId(0x00105823)
-        seed = None
-        amplitude = None
-        scale = None
-        step = None
-        persistence = None
-        position = None
-        output = None
-        noise_type = None
-        self.noise = Noise()
-        self.noise.reset_tables()
-        self.seed = 1234.0
+        self.noise = Noise(seed=1234)
+        self._seed_value = 1234
 
     # factory to create the node
     @classmethod
@@ -37,7 +33,7 @@ class NoiseNode(OpenMaya.MPxNode):
         return cls()
 
     @classmethod
-    def _make_double_attribute(cls, name, short, default_value=0.0, type=OpenMaya.MFnNumericData.kDouble):
+    def _make_numeric_attribute(cls, name, short, default_value=0.0, type=OpenMaya.MFnNumericData.kDouble):
         fn = OpenMaya.MFnNumericAttribute()
 
         if type == OpenMaya.MFnNumericData.k3Double:
@@ -81,12 +77,12 @@ class NoiseNode(OpenMaya.MPxNode):
         enum_attribute_fn.readable = True
         OpenMaya.MPxNode.addAttribute(NoiseNode.noise_type)
 
-        NoiseNode.seed = NoiseNode._make_double_attribute("seed", "se", 1234.0)
-        NoiseNode.amplitude = NoiseNode._make_double_attribute("amplitude", "amp", 1.0)
-        NoiseNode.scale = NoiseNode._make_double_attribute("scale", "sc", 1.0)
-        NoiseNode.step = NoiseNode._make_double_attribute("step", "st", 4.0)
-        NoiseNode.persistence = NoiseNode._make_double_attribute("persistence", "pe", 1.0)
-        NoiseNode.position = NoiseNode._make_double_attribute(
+        NoiseNode.seed = NoiseNode._make_numeric_attribute("seed", "se", 1234, OpenMaya.MFnNumericData.kInt)
+        NoiseNode.amplitude = NoiseNode._make_numeric_attribute("amplitude", "amp", 1.0)
+        NoiseNode.scale = NoiseNode._make_numeric_attribute("scale", "sc", 1.0)
+        NoiseNode.step = NoiseNode._make_numeric_attribute("step", "st", 4.0)
+        NoiseNode.persistence = NoiseNode._make_numeric_attribute("persistence", "pe", 1.0)
+        NoiseNode.position = NoiseNode._make_numeric_attribute(
             "position", "pos", [(0.0, 0.0, 0.0)], type=OpenMaya.MFnNumericData.k3Double
         )
         numeric_attrib_fn = OpenMaya.MFnNumericAttribute()
@@ -120,16 +116,16 @@ class NoiseNode(OpenMaya.MPxNode):
         # we only need to compute if the plug is the output node changing
         if plug == NoiseNode.output:
             position_data = data.inputValue(NoiseNode.position).asDouble3()
-            seed_data = data.inputValue(NoiseNode.seed).asFloat()
+            seed_data = data.inputValue(NoiseNode.seed).asInt()
             amplitude_data = data.inputValue(NoiseNode.amplitude).asDouble()
             scale_data = data.inputValue(NoiseNode.scale).asDouble()
             step_data = data.inputValue(NoiseNode.step).asDouble()
             persistence_data = data.inputValue(NoiseNode.persistence).asDouble()
 
-            # if seed_data != self.seed:
-            #     self.noise.seed(seed_data)
-            #     self.noise.reset_tables()
-            #     self.seed = seed_data
+            if seed_data != self._seed_value:
+                print("resetting tables")
+                self.noise.seed = seed_data
+                self._seed_value = seed_data
             selected_noise_type = data.inputValue(NoiseNode.noise_type).asInt()
             if selected_noise_type == 0:
                 output = self.noise.noise(scale_data, tuple(position_data)) * amplitude_data
@@ -137,7 +133,12 @@ class NoiseNode(OpenMaya.MPxNode):
                 output = self.noise.turbulence(scale_data, tuple(position_data)) * amplitude_data
             elif selected_noise_type == 2:
                 output = (
-                    self.noise.complex(int(step_data), persistence_data, scale_data, tuple(position_data))
+                    self.noise.complex(
+                        int(step_data),
+                        persistence_data,
+                        scale_data,
+                        tuple(position_data),
+                    )
                     * amplitude_data
                 )
             output_data = data.outputValue(NoiseNode.output)
