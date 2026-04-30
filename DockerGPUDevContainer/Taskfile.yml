@@ -1,0 +1,24 @@
+version: "3"
+dotenv: [.env]
+tasks:
+  build:
+    cmds:
+      - podman-compose build --no-cache
+
+  up:
+    cmds:
+      - podman-compose up -d
+
+  down:
+    cmds:
+      - podman-compose down
+
+  test:
+    cmds:
+      - task: up
+      - sleep 2
+      - podman exec -it opengl-dev bash
+
+  bash:
+    cmds:
+      - podman exec -it opengl-dev bash

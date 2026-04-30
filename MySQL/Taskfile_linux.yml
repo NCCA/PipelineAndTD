@@ -1,7 +1,5 @@
 version: "3"
 
-
-
 tasks:
   create-image:
     cmds:
@@ -15,6 +13,6 @@ tasks:
           -e MYSQL_DATABASE=mydb \
           -e MYSQL_USER=dbuser \
           -e MYSQL_PASSWORD=dbuser \
-          -p 3306:3306 \
+          -p 0.0.0.0:3306:3306 \ 
           -v mysql_data:/transfer/mysql \
           mysql:latest

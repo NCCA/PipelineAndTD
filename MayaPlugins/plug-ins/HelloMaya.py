@@ -48,9 +48,7 @@ def initializePlugin(plugin):
     try:
         plugin_fn.registerCommand(HelloMaya.CMD_NAME, HelloMaya.creator)
     except:
-        om.MGlobal.displayError(
-            "Failed to register command: {0}".format(HelloMaya.CMD_NAME)
-        )
+        om.MGlobal.displayError("Failed to register command: {0}".format(HelloMaya.CMD_NAME))
 
 
 def uninitializePlugin(plugin):
@@ -61,9 +59,7 @@ def uninitializePlugin(plugin):
     try:
         plugin_fn.deregisterCommand(HelloMaya.CMD_NAME)
     except:
-        om.MGlobal.displayError(
-            "Failed to deregister command: {0}".format(HelloMaya.CMD_NAME)
-        )
+        om.MGlobal.displayError("Failed to deregister command: {0}".format(HelloMaya.CMD_NAME))
 
 
 if __name__ == "__main__":
@@ -75,13 +71,6 @@ if __name__ == "__main__":
 
     plugin_name = "HelloMaya.py"
 
-    cmds.evalDeferred(
-        'if cmds.pluginInfo("{0}", q=True, loaded=True): cmds.unloadPlugin("{0}")'.format(
-            plugin_name
-        )
-    )
-    cmds.evalDeferred(
-        'if not cmds.pluginInfo("{0}", q=True, loaded=True): cmds.loadPlugin("{0}")'.format(
-            plugin_name
-        )
-    )
+    cmds.evalDeferred('if cmds.pluginInfo("{0}", q=True, loaded=True): cmds.unloadPlugin("{0}")'.format(plugin_name))
+    cmds.evalDeferred('if not cmds.pluginInfo("{0}", q=True, loaded=True): cmds.loadPlugin("{0}")'.format(plugin_name))
+    cmds.HelloMayaPy()

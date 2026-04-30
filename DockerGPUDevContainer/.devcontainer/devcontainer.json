@@ -1,0 +1,45 @@
+{
+  // Zed devcontainer support: https://zed.dev/docs/dev-containers
+  "name": "GPU Dev (NVIDIA + uv)",
+
+  // Use the compose file rather than a standalone Dockerfile so GPU
+  // resource configuration is consistent between compose and devcontainer.
+  "dockerComposeFile": "../compose.yaml",
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+
+  // Shut down the compose project when the devcontainer session ends.
+  "shutdownAction": "stopCompose",
+
+  // Run after the container starts — sync deps in case the lockfile
+  // has changed since the image was built.
+  "postStartCommand": "uv sync",
+
+  // Environment variables forwarded into the container session.
+  "remoteEnv": {
+    "NVIDIA_VISIBLE_DEVICES": "all",
+    "NVIDIA_DRIVER_CAPABILITIES": "compute,utility"
+  },
+
+  // Zed extensions to install inside the devcontainer.
+  // See https://zed.dev/extensions for IDs.
+  "extensions": [
+    "python",
+    "toml"
+  ],
+
+  // Zed editor / LSP settings applied inside the container.
+  "settings": {
+    "lsp": {
+      "pylsp": {
+        "settings": {
+          "pylsp": {
+            "plugins": {
+              "ruff": { "enabled": true }
+            }
+          }
+        }
+      }
+    }
+  }
+}

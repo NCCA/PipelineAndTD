@@ -22,5 +22,5 @@ add_sub_layer("./cube.usda", root)
 print(stage.GetRootLayer().ExportToString())
 
 # Save the resulting layer
-# stage.Export("layer-cube.usda", addSourceFileComment=False)
+stage.Export("layer-cube.usda", addSourceFileComment=False)
 stage.GetRootLayer().Save()

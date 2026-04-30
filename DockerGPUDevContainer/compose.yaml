@@ -1,0 +1,54 @@
+name: opengl-dev
+
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: opengl-dev:latest
+    container_name: opengl-dev
+    network_mode: host # container shares host so X11 should work
+    privileged: true  # Required for X11 access with Podman
+    # Mount your project into the container
+    volumes:
+      - .:/workspace:z # :z fixes SELinux labelling for Podman
+      - uv-cache:/root/.cache/uv # persist uv's download cache across rebuilds
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw # rw not ro for Podman
+      - ${XAUTHORITY:-~/.Xauthority}:/root/.Xauthority:rw
+
+    working_dir: /workspace
+
+    # Keep container alive for devcontainer / exec sessions
+    stdin_open: true
+    tty: true
+
+    # NVIDIA GPU access — requires nvidia-ctk to be installed on the host
+    # and `nvidia-ctk runtime configure` to have been run.
+    # With Podman: `nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml`
+    # then the CDI devices block below is used instead of the deploy block.
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all # or set to a specific number, e.g. 1
+              capabilities: [gpu]
+
+    # CDI alternative for Podman (uncomment if the deploy block doesn't work):
+    # devices:
+    #   - nvidia.com/gpu=all
+
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all  # Changed to 'all' to include graphics
+      # Forward host DISPLAY (e.g. :0 or :1) into the container
+      - DISPLAY=${DISPLAY}
+      - XAUTHORITY=/root/.Xauthority
+      # Tell Qt to use xcb (X11) — stops it hunting for Wayland/offscreen
+      - QT_QPA_PLATFORM=xcb
+      # Additional Qt debugging
+      - QT_DEBUG_PLUGINS=1  # Enable Qt plugin debugging if needed
+      - QT_X11_NO_MITSHM=1  # Disable shared memory for X11 (helps with container isolation)
+
+volumes:
+  uv-cache:

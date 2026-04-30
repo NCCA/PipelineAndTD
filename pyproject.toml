@@ -12,7 +12,6 @@ dependencies = [
     "mkdocstrings[python]>=0.29.1",
     "pyside6>=6.9.0",
     "qtpy>=2.4.3",
-    "usd-core>=25.11",
 ]
 
 

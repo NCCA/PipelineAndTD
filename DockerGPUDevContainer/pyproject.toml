@@ -1,0 +1,7 @@
+[project]
+name = "dockergpudevcontainer"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "ncca-ngl>=0.5.3",
+]

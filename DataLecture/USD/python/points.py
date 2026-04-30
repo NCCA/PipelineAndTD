@@ -39,7 +39,7 @@ UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.y)
 UsdGeom.SetStageMetersPerUnit(stage, 1.0)
 
 pointsPrim = UsdGeom.Points.Define(stage, "/World/PointSet1")
-num_particles = 10000
+num_particles = 500000
 
 points = [random_point_on_sphere(10) for _ in range(num_particles)]
 pointsPrim.CreatePointsAttr().Set(points, time=0)

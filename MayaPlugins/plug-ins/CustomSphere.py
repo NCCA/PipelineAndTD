@@ -117,4 +117,4 @@ if __name__ == "__main__":
         'if not cmds.pluginInfo(f"{plugin_name}", q=True, loaded=True): cmds.loadPlugin(f"{plugin_name}")'
     )
 
-    cmds.CustromSpherePy(100)
+    cmds.CustomSpherePy(100)
