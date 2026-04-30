@@ -143,7 +143,6 @@ class CubeLocatorNode(omui.MPxLocatorNode):
     textColour = None
 
     # ------------------------------------------------------------------
-    # ------------------------------------------------------------------
     @classmethod
     def creator(cls):
         return cls()
