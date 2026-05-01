@@ -34,6 +34,7 @@ import sys
 # ---------------------------------------------------------------------------
 import maya.api.OpenMaya as om2
 import maya.api.OpenMayaAnim as oma2
+import maya.cmds as cmds
 
 # ---------------------------------------------------------------------------
 # API 1.0 – for classes not yet ported to API 2.0
@@ -41,7 +42,7 @@ import maya.api.OpenMayaAnim as oma2
 import maya.OpenMaya as om1
 import maya.OpenMayaAnim as oma1
 import maya.OpenMayaMPx as mpx
-import maya.OpenMayaRender as omr1  # MCommonRenderSettingsData, MRenderUtil
+import maya.OpenMayaRender as omr  # MCommonRenderSettingsData, MRenderUtil
 
 # ---------------------------------------------------------------------------
 # Plugin metadata
@@ -51,11 +52,6 @@ PLUGIN_VERSION = "1.0"
 PLUGIN_VENDOR = "Jon Macey"
 OPTION_SCRIPT = "RibExportScript"
 DEFAULT_OPTIONS = ""
-
-
-def _fmt(fmt_str, *args):
-    """printf-style formatting helper."""
-    return fmt_str % args
 
 
 # ===========================================================================
@@ -99,14 +95,14 @@ class RibExport(mpx.MPxFileTranslator):
         for frame in range(self._start_frame, self._end_frame + 1, self._frame_step):
             oma2.MAnimControl.setCurrentTime(om2.MTime(frame, om2.MTime.uiUnit()))
 
-            om1.MGlobal.displayInfo(_fmt("Exporting frame  %0*d", self._frame_pad, frame))
+            om1.MGlobal.displayInfo(f"Exporting frame  {frame:0{self._frame_pad}d}")
 
-            rib_path = _fmt("%s.%0*d.rib", base_path, self._frame_pad, frame)
+            rib_path = f"{base_path}.{frame:0{self._frame_pad}d}.rib"
 
             try:
                 stream = open(rib_path, "w")
             except IOError as exc:
-                om1.MGlobal.displayError("Error opening file: %s" % rib_path)
+                om1.MGlobal.displayError(f"Error opening file: {rib_path}")
                 om1.MGlobal.displayError(str(exc))
                 return
 
@@ -114,8 +110,8 @@ class RibExport(mpx.MPxFileTranslator):
                 self._stream = stream
 
                 stream.write("# rib export Maya Script \n")
-                stream.write(_fmt('Display "%s.%0*d.exr" "it" "rgba" \n', self._image_name, self._frame_pad, frame))
-                stream.write("Format %d %d %g\n" % (self._image_width, self._image_height, self._pixel_aspect_ratio))
+                stream.write(f'Display "{self._image_name}.{frame:0{self._frame_pad}d}.exr" "it" "rgba" \n')
+                stream.write(f"Format {self._image_width} {self._image_height} {self._pixel_aspect_ratio:g}\n")
 
                 self._export_camera()
                 stream.write("WorldBegin \n")
@@ -146,7 +142,7 @@ class RibExport(mpx.MPxFileTranslator):
             if renderable:
                 fl = cam_fn.focalLength
                 fov_rad = 2.0 * math.atan((self._image_width / float(self._image_height)) * 12.7 / fl)
-                self._stream.write('Projection "perspective" "uniform float fov" [%g]\n' % math.degrees(fov_rad))
+                self._stream.write(f'Projection "perspective" "uniform float fov" [{math.degrees(fov_rad):g}]\n')
 
                 dag_fn = om2.MFnDagNode(node)
                 dag_path = dag_fn.getPath()
@@ -158,7 +154,7 @@ class RibExport(mpx.MPxFileTranslator):
                 self._stream.write("ConcatTransform [ ")
                 for row in range(4):
                     for col in range(4):
-                        self._stream.write(" %g " % tx_inv.getElement(row, col))
+                        self._stream.write(f" {tx_inv.getElement(row, col):g} ")
                 self._stream.write(" ]\n")
                 return
 
@@ -196,18 +192,10 @@ class RibExport(mpx.MPxFileTranslator):
         try:
             dag_path = dag_fn.getPath()
         except Exception:
-            om1.MGlobal.displayWarning("Could not get dag path for light: %s" % dag_fn.name())
+            om1.MGlobal.displayWarning(f"Could not get dag path for light: {dag_fn.name()}")
             return
 
         world_mtx = dag_path.inclusiveMatrix()
-        # MMatrix in API 1.0 uses (row, col) subscript operator via __getitem__
-        # pos_x = world_mtx(3, 0)
-        # pos_y = world_mtx(3, 1)
-        # pos_z = world_mtx(3, 2)
-        # dir_x = -world_mtx(2, 0)
-        # dir_y = -world_mtx(2, 1)
-        # dir_z = -world_mtx(2, 2)
-        # API 1.0 MMatrix: elements accessed as flat list [row * 4 + col]
         pos_x = world_mtx[3 * 4 + 0]
         pos_y = world_mtx[3 * 4 + 1]
         pos_z = world_mtx[3 * 4 + 2]
@@ -222,51 +210,36 @@ class RibExport(mpx.MPxFileTranslator):
             cone_angle = spot_fn.coneAngle()
             penumbra = spot_fn.penumbraAngle()
             self._stream.write(
-                'LightSource "spotlight" 1 '
-                '"intensity" [%g] '
-                '"lightcolor" [%g %g %g] '
-                '"from" [%g %g %g] '
-                '"to" [%g %g %g] '
-                '"coneangle" [%g] '
-                '"conedeltaangle" [%g]\n'
-                % (
-                    intensity,
-                    r,
-                    g,
-                    b,
-                    pos_x,
-                    pos_y,
-                    pos_z,
-                    pos_x + dir_x,
-                    pos_y + dir_y,
-                    pos_z + dir_z,
-                    cone_angle,
-                    penumbra,
-                )
+                f'LightSource "spotlight" 1 '
+                f'"intensity" [{intensity:g}] '
+                f'"lightcolor" [{r:g} {g:g} {b:g}] '
+                f'"from" [{pos_x:g} {pos_y:g} {pos_z:g}] '
+                f'"to" [{pos_x + dir_x:g} {pos_y + dir_y:g} {pos_z + dir_z:g}] '
+                f'"coneangle" [{cone_angle:g}] '
+                f'"conedeltaangle" [{penumbra:g}]\n'
             )
 
         elif node_type == om1.MFn.kDirectionalLight:
             self._stream.write(
-                'LightSource "distantlight" 1 '
-                '"intensity" [%g] '
-                '"lightcolor" [%g %g %g] '
-                '"from" [%g %g %g] '
-                '"to" [%g %g %g]\n'
-                % (intensity, r, g, b, pos_x - dir_x, pos_y - dir_y, pos_z - dir_z, pos_x, pos_y, pos_z)
+                f'LightSource "distantlight" 1 '
+                f'"intensity" [{intensity:g}] '
+                f'"lightcolor" [{r:g} {g:g} {b:g}] '
+                f'"from" [{pos_x - dir_x:g} {pos_y - dir_y:g} {pos_z - dir_z:g}] '
+                f'"to" [{pos_x:g} {pos_y:g} {pos_z:g}]\n'
             )
 
         elif node_type == om1.MFn.kAmbientLight:
             self._stream.write(
-                'LightSource "ambientlight" 1 "intensity" [%g] "lightcolor" [%g %g %g]\n' % (intensity, r, g, b)
+                f'LightSource "ambientlight" 1 "intensity" [{intensity:g}] "lightcolor" [{r:g} {g:g} {b:g}]\n'
             )
 
         else:
             # Default: point light
             self._stream.write(
-                'LightSource "pointlight" 1 '
-                '"intensity" [%g] '
-                '"lightcolor" [%g %g %g] '
-                '"from" [%g %g %g]\n' % (intensity, r, g, b, pos_x, pos_y, pos_z)
+                f'LightSource "pointlight" 1 '
+                f'"intensity" [{intensity:g}] '
+                f'"lightcolor" [{r:g} {g:g} {b:g}] '
+                f'"from" [{pos_x:g} {pos_y:g} {pos_z:g}]\n'
             )
 
     # ------------------------------------------------------------------
@@ -292,11 +265,11 @@ class RibExport(mpx.MPxFileTranslator):
         dag_path = dag_fn.getPath()
         tx = dag_path.inclusiveMatrix()
 
-        self._stream.write("# exporting maya mesh %s\n" % mesh.name())
+        self._stream.write(f"# exporting maya mesh {mesh.name()}\n")
         self._stream.write("ConcatTransform [ ")
         for row in range(4):
             for col in range(4):
-                self._stream.write(" %g " % tx.getElement(row, col))
+                self._stream.write(f" {tx.getElement(row, col):g} ")
         self._stream.write(" ]\n")
 
         vts = mesh.getPoints(om2.MSpace.kObject)
@@ -315,21 +288,21 @@ class RibExport(mpx.MPxFileTranslator):
             self._stream.write('"vertex point P" [')
             for i in range(vc):
                 p = vts[it_poly.vertexIndex(i)]
-                self._stream.write("%g %g %g " % (p.x, p.y, p.z))
+                self._stream.write(f"{p.x:g} {p.y:g} {p.z:g} ")
             self._stream.write("] ")
 
             if self._export_normals:
                 self._stream.write('"varying normal N" [')
                 for i in range(vc):
                     n = nmls[it_poly.normalIndex(i)]
-                    self._stream.write("%g %g %g " % (n.x, n.y, n.z))
+                    self._stream.write(f"{n.x:g} {n.y:g} {n.z:g} ")
                 self._stream.write("] ")
 
             if has_uvs and self._export_uv:
                 self._stream.write('"varying float[2] st" [')
                 for i in range(vc):
                     idx = it_poly.getUVIndex(i)
-                    self._stream.write("%g %g " % (u_array[idx], v_array[idx]))
+                    self._stream.write(f"{u_array[idx]:g} {v_array[idx]:g} ")
                 self._stream.write("] ")
 
             self._stream.write("\n")
@@ -341,13 +314,13 @@ class RibExport(mpx.MPxFileTranslator):
     # Render globals  (API 1.0 – MCommonRenderSettingsData missing from 2.0)
     # ------------------------------------------------------------------
     def _get_render_globals(self):
-        data = omr1.MCommonRenderSettingsData()
-        omr1.MRenderUtil.getCommonRenderSettings(data)
+        data = omr.MCommonRenderSettingsData()
+        omr.MRenderUtil.getCommonRenderSettings(data)
 
         self._start_frame = int(data.frameStart.value())
         self._end_frame = int(data.frameEnd.value())
         self._frame_step = int(data.frameBy)
-        self._image_name = data.name
+        self._image_name = cmds.getAttr("defaultRenderGlobals.imageFilePrefix") or "noNameSet"
         self._pixel_aspect_ratio = data.pixelAspectRatio
         self._image_width = data.width
         self._image_height = data.height
@@ -403,7 +376,7 @@ def initializePlugin(plugin):
             DEFAULT_OPTIONS,
         )
     except Exception as exc:
-        sys.stderr.write("Failed to register '%s': %s\n" % (PLUGIN_NAME, exc))
+        sys.stderr.write(f"Failed to register '{PLUGIN_NAME}': {exc}\n")
         raise
 
 
@@ -412,5 +385,5 @@ def uninitializePlugin(plugin):
     try:
         plugin_fn.deregisterFileTranslator(PLUGIN_NAME)
     except Exception as exc:
-        sys.stderr.write("Failed to deregister '%s': %s\n" % (PLUGIN_NAME, exc))
+        sys.stderr.write(f"Failed to deregister '{PLUGIN_NAME}': {exc}\n")
         raise
