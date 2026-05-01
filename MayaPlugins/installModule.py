@@ -44,6 +44,7 @@ def install_module(location: str) -> None:
         file.write(f"+ {MODULE_NAME} 1.0 {current_dir}\n")
         file.write("MAYA_PLUG_IN_PATH +:= plug-ins\n")
         file.write("MAYA_SCRIPT_PATH +:= plug-ins/AETemplates\n")
+        file.write("MAYA_SCRIPT_PATH += plug-ins/scripts\n")
         file.write("XBMLANGPATH +:= plug-ins/icons\n")
         file.write("PYTHONPATH +:= plug-ins/modules\n")
 
